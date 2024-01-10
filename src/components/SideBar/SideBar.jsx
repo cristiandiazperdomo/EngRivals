@@ -9,7 +9,7 @@ export const SideBar = () => {
         >
             <div className="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
                 <ul className="space-y-2 font-medium">
-                    <li className="pb-16 pt-3">
+                    <li className="pb-2 pt-3">
                         <Brand />
                     </li>
                     <li>

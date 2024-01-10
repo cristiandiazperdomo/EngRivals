@@ -45,7 +45,7 @@ export const LoggedHeader = () => {
                         ...
                         <img
                             src="https://tailwindui.com/img/avatar-3.jpg"
-                            className="rounded-full ml-0.5 w-11 group-hover:shadow-xl group-hover:shadow-red-200"
+                            className="rounded-full ml-0.5 w-11 group-hover:shadow-xl group-hover:shadow-gray-300"
                             alt="profile"
                         />
                     </button>

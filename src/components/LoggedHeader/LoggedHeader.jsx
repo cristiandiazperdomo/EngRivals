@@ -2,7 +2,7 @@ import {Separator} from "@radix-ui/themes";
 
 export const LoggedHeader = () => {
     return (
-        <header className="ml-64">
+        <header className="ml-64 bg-slate-50">
             <div className="mx-8">
                 <div className="flex justify-between items-center py-8">
                     <div className="flex text-md font-bold text-gray-500">
@@ -50,7 +50,7 @@ export const LoggedHeader = () => {
                         />
                     </button>
                 </div>
-                <div className="border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700"></div>
+                <div className="rounded-lg dark:border-gray-700"></div>
             </div>
         </header>
     );

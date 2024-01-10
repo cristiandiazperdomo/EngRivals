@@ -1,14 +1,22 @@
+import {useContext} from "react";
 import {ChallengeCard} from "../../components/Cards/ChallengeCard";
 import {Lobbies} from "../../components/Lobbies/Lobbies";
 import {LoggedHeader} from "../../components/LoggedHeader/LoggedHeader";
 import {SideBar} from "../../components/SideBar/SideBar";
+import {MyContext} from "../../context/AppContext";
 
 export const Dashboard = () => {
+    const {isSideBarActive} = useContext(MyContext);
+
     return (
         <div>
             <LoggedHeader />
             <SideBar />
-            <div className="px-4 sm:ml-64">
+            <div
+                className={`px-4 transition-all duration-500 ${
+                    isSideBarActive ? "ml-64" : "container mx-auto"
+                }`}
+            >
                 <div className="px-4 rounded-lg dark:border-gray-700">
                     <div className="my-12">
                         <h2 className="text-3xl font-bold text-red-700">

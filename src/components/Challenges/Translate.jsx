@@ -87,7 +87,7 @@ export const Translate = () => {
                             </p>
                         </header>
                         <PhraseCard />
-                        {useButtons ? (
+                        {!useButtons ? (
                             <Textarea />
                         ) : (
                             <ul className="mt-4 space-y-2">

@@ -1,10 +1,18 @@
+import {useContext} from "react";
 import {Brand} from "../../components/Brand/Brand";
+import {MyContext} from "../../context/AppContext";
 
 export const SideBar = () => {
+    const {isSideBarActive} = useContext(MyContext);
+
+    console.log(isSideBarActive, "isSideBarActive in Sidear");
+
     return (
         <aside
             id="cta-button-sidebar"
-            className="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0"
+            className={`fixed top-0 left-0 z-40 w-64 h-screen transition-transform ${
+                isSideBarActive ? "translate-x-0" : "-translate-x-full"
+            }`}
             aria-label="Sidebar"
         >
             <div className="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
@@ -74,15 +82,15 @@ export const SideBar = () => {
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                class="icon icon-tabler icon-tabler-stars transition-all duration-150 icon icon-tabler icon-tabler-settings-filled flex-shrink-0 w-6 h-6 text-gray-500 dark:text-gray-400 group-hover:text-yellow-500 dark:group-hover:text-white"
+                                className="icon icon-tabler icon-tabler-stars transition-all duration-150 icon icon-tabler icon-tabler-settings-filled flex-shrink-0 w-6 h-6 text-gray-500 dark:text-gray-400 group-hover:text-yellow-500 dark:group-hover:text-white"
                                 width="24"
                                 height="24"
                                 viewBox="0 0 24 24"
-                                stroke-width="2"
+                                strokeWidth="2"
                                 stroke="currentColor"
                                 fill="none"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
                             >
                                 <path
                                     stroke="none"
@@ -105,15 +113,15 @@ export const SideBar = () => {
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                class="icon icon-tabler icon-tabler-settings transition-all duration-150 icon icon-tabler icon-tabler-settings-filled flex-shrink-0 w-6 h-6 text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                                className="icon icon-tabler icon-tabler-settings transition-all duration-150 icon icon-tabler icon-tabler-settings-filled flex-shrink-0 w-6 h-6 text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
                                 width="24"
                                 height="24"
                                 viewBox="0 0 24 24"
-                                stroke-width="2"
+                                strokeWidth="2"
                                 stroke="currentColor"
                                 fill="none"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
                             >
                                 <path
                                     stroke="none"
@@ -135,15 +143,15 @@ export const SideBar = () => {
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                class="icon icon-tabler icon-tabler-logout flex-shrink-0 w-6 h-6 text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                                className="icon icon-tabler icon-tabler-logout flex-shrink-0 w-6 h-6 text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
                                 width="24"
                                 height="24"
                                 viewBox="0 0 24 24"
-                                stroke-width="2"
+                                strokeWidth="2"
                                 stroke="currentColor"
                                 fill="none"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
                             >
                                 <path
                                     stroke="none"

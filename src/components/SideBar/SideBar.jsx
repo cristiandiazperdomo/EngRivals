@@ -10,7 +10,7 @@ export const SideBar = () => {
     return (
         <aside
             id="cta-button-sidebar"
-            className={`absolute sm:fixed top-0 left-0 z-40 w-64 h-screen transition-transform ${
+            className={`absolute sm:fixed top-0 left-0 z-40 w-64 bottom-0 transition-transform ${
                 isSideBarActive ? "translate-x-0" : "-translate-x-full"
             }`}
             aria-label="Sidebar"

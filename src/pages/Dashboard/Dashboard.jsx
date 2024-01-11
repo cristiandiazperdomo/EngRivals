@@ -62,7 +62,7 @@ export const Dashboard = () => {
                         Lobbies
                     </h3>
                     <div className="my-12">
-                        <Lobbies />
+                        <Lobbies handleCreateLobby={handleCreateLobby} />
                     </div>
                 </div>
             </div>

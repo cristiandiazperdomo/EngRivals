@@ -31,7 +31,7 @@ export const HeroSection = () => {
                             <path d="M13 6l6 6" />
                         </svg>
                     </Badge>
-                    <div className="text-left">
+                    <div className="text-left w-full">
                         <div className="my-10">
                             <h2 className="text-left text-5xl sm:text-6xl font-bold">
                                 <span className="text-red-500 block">

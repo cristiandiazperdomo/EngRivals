@@ -4,6 +4,7 @@ import {Home} from "./pages/Home/Home";
 import {SignUp} from "./pages/SignUp/SignUp";
 import {Rooms} from "./pages/Rooms/Rooms";
 import {Dashboard} from "./pages/Dashboard/Dashboard";
+import {EnglishLevel} from "./pages/EnglishLevel/EnglishLevel.jsx";
 import {MyContext} from "./context/AppContext.js";
 import {useInitialState} from "./hooks/useInitialState.js";
 import {BrowserRouter} from "react-router-dom";
@@ -26,6 +27,10 @@ export default function App() {
                             <Route path="/" element={<Home />}></Route>
                             <Route path="/signin" element={<SignIn />}></Route>
                             <Route path="/signup" element={<SignUp />}></Route>
+                            <Route
+                                path="/englishlevel"
+                                element={<EnglishLevel />}
+                            ></Route>
                             <Route path="/rooms" element={<Rooms />}></Route>
                             <Route
                                 path="/dashboard"

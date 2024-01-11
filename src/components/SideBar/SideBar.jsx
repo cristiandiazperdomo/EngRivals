@@ -3,22 +3,41 @@ import {Brand} from "../../components/Brand/Brand";
 import {MyContext} from "../../context/AppContext";
 
 export const SideBar = () => {
-    const {isSideBarActive} = useContext(MyContext);
+    const {toggleSideBar, isSideBarActive} = useContext(MyContext);
 
     console.log(isSideBarActive, "isSideBarActive in Sidear");
 
     return (
         <aside
             id="cta-button-sidebar"
-            className={`fixed top-0 left-0 z-40 w-64 h-screen transition-transform ${
+            className={`absolute sm:fixed top-0 left-0 z-40 w-64 h-screen transition-transform ${
                 isSideBarActive ? "translate-x-0" : "-translate-x-full"
             }`}
             aria-label="Sidebar"
         >
-            <div className="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
+            <div className="h-full px-3 py-4 overflow-y-auto bg-gray-50">
                 <ul className="space-y-2 font-medium">
-                    <li className="pb-2 pt-3">
+                    <li className="pb-2 pt-3 flex justify-between items-center">
                         <Brand />
+                        <svg
+                            onClick={toggleSideBar}
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="icon icon-tabler icon-tabler-arrow-bar-left text-gray-500 hover:text-gray-900 cursor-pointer transition-all duration-150"
+                            width="28"
+                            height="28"
+                            viewBox="0 0 24 24"
+                            stroke-width="2"
+                            stroke="currentColor"
+                            fill="none"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M4 12l10 0" />
+                            <path d="M4 12l4 4" />
+                            <path d="M4 12l4 -4" />
+                            <path d="M20 4l0 16" />
+                        </svg>
                     </li>
                     <li>
                         <a

@@ -46,7 +46,7 @@ export const Translate = () => {
                     <div className="flex">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            class="icon icon-tabler icon-tabler-stars-filled text-yellow-600"
+                            className="icon icon-tabler icon-tabler-stars-filled text-yellow-600"
                             width="32"
                             height="32"
                             viewBox="0 0 24 24"
@@ -124,7 +124,7 @@ export const Translate = () => {
                     <div className="flex space-x-2 text-gray-600 items-center">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            class="icon icon-tabler icon-tabler-clock-hour-12"
+                            className="icon icon-tabler icon-tabler-clock-hour-12"
                             width="28"
                             height="28"
                             viewBox="0 0 24 24"

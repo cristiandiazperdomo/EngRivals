@@ -1,6 +1,9 @@
-export const ChallengeCard = ({category, videoUrl}) => {
+export const ChallengeCard = ({category, videoUrl, handleCreateLobby}) => {
     return (
-        <div className="relative w-[calc(100%-16px)] md:w-[calc(50%-16px)] xl:w-[calc(25%-16px)] rounded-xl group cursor-pointer">
+        <div
+            className="relative w-[calc(100%-16px)] md:w-[calc(50%-16px)] xl:w-[calc(25%-16px)] rounded-xl group cursor-pointer"
+            onClick={handleCreateLobby}
+        >
             <video
                 className="relative rounded-xl z-0 h-full"
                 autoPlay

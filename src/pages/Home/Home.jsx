@@ -6,9 +6,11 @@ export function Home() {
     return (
         <>
             <div className="container mx-auto">
-                <Header />
-                <HeroSection />
-                <FeatureList />
+                <div className="mx-4">
+                    <Header />
+                    <HeroSection />
+                    <FeatureList />
+                </div>
             </div>
         </>
     );

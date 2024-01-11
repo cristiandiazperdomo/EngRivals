@@ -3,13 +3,12 @@ import {MyContext} from "../../context/AppContext";
 
 export const LoggedHeader = () => {
     const {toggleSideBar, isSideBarActive} = useContext(MyContext);
-    console.log(isSideBarActive);
 
     return (
         <header className={`bg-gray-50`}>
             <div
                 className={`transition-all duration-500 ${
-                    isSideBarActive ? "ml-64" : "container mx-auto"
+                    isSideBarActive ? "ml-0 sm:ml-64" : "container mx-auto"
                 }`}
             >
                 <div className="mx-8">

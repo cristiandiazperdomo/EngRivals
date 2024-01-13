@@ -11,6 +11,7 @@ import {BrowserRouter} from "react-router-dom";
 
 import {Theme} from "@radix-ui/themes";
 import {Dashboard} from "./pages/Dashboard/Dashboard.jsx";
+import {Profile} from "./pages/Profile/Profile.jsx";
 export default function App() {
     const initialState = useInitialState();
 
@@ -28,6 +29,10 @@ export default function App() {
                             <Route path="/" element={<Home />}></Route>
                             <Route path="/signin" element={<SignIn />}></Route>
                             <Route path="/signup" element={<SignUp />}></Route>
+                            <Route
+                                path="/profile"
+                                element={<Profile />}
+                            ></Route>
                             <Route
                                 path="/englishlevel"
                                 element={<EnglishLevel />}

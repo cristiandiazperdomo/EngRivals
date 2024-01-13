@@ -16,7 +16,7 @@ export const Dashboard = () => {
             <div className="container flex flex-col lg:flex-row mx-auto">
                 <SideBarLeft />
                 <div
-                    className={`px-4 transition-all duration-500 w-[100%] md:w-[800px] ${
+                    className={`px-4 transition-all duration-500 w-[100%] lg:w-[800px] ${
                         isSideBarActive ? "mx-auto" : ""
                     }`}
                 >
@@ -51,7 +51,7 @@ export const Dashboard = () => {
                             <h3 className="text-3xl font-bold text-red-700 mb-2">
                                 What Sets Us Apart?
                             </h3>
-                            <ul class="max-w-md space-y-1 text-gray-500 list-disc list-inside dark:text-gray-400">
+                            <ul className="max-w-md xl:max-w-lg space-y-1 text-gray-500 list-disc list-inside dark:text-gray-400">
                                 <li>
                                     <span className="font-bold">
                                         Daily Challenges:
@@ -85,7 +85,7 @@ export const Dashboard = () => {
                             <h3 className="text-3xl font-bold text-red-700 mb-2">
                                 Why Choose Us?
                             </h3>
-                            <ul class="max-w-md space-y-1 text-gray-500 list-disc list-inside dark:text-gray-400">
+                            <ul className="max-w-md xl:max-w-lg space-y-1 text-gray-500 list-disc list-inside dark:text-gray-400">
                                 <li>
                                     <span className="font-bold">
                                         Elite Community:

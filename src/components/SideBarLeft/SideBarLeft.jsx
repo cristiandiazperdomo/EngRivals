@@ -14,8 +14,8 @@ export const SideBarLeft = () => {
             }`}
             aria-label="Sidebar"
         >
-            <div className="h-full w-full px-3 py-4 overflow-y-auto bg-gray-50 grid justify-center">
-                <div className="pb-2 pt-3 space-x-4 flex justify-between items-center self-start">
+            <div className="min-h-screen w-full px-3 py-4 overflow-y-auto bg-gradient-to-b from-gray-50 via-gray-50 to-transparent grid justify-center">
+                <div className="pb-2 pt-3 space-x-4 flex justify-between self-start items-center">
                     <Brand />
                     <svg
                         onClick={toggleSideBar}
@@ -37,15 +37,15 @@ export const SideBarLeft = () => {
                         <path d="M20 4l0 16" />
                     </svg>
                 </div>
-                <ul className="space-y-2 font-medium min-w-[200px] -mt-40">
+                <ul className="space-y-2 font-medium min-w-[200px] sm:-mt-40 bg-gray-20">
                     <li>
                         <Link
                             to="/dashboard"
-                            className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                            className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group"
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                className="transition-all duration-150 icon icon-tabler icon-tabler-home flex-shrink-0 w-6 h-6 text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                                className="transition-all duration-150 icon icon-tabler icon-tabler-home flex-shrink-0 w-6 h-6 text-gray-500 group-hover:text-gray-900"
                                 viewBox="0 0 24 24"
                                 strokeWidth="2"
                                 stroke="currentColor"
@@ -68,7 +68,7 @@ export const SideBarLeft = () => {
                     <li>
                         <Link
                             to="/groupchallenges"
-                            className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-red-100 hover:text-red-600 dark:hover:bg-gray-700 group"
+                            className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-red-100 hover:text-red-600 group"
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -96,11 +96,11 @@ export const SideBarLeft = () => {
                     <li>
                         <a
                             href="#"
-                            className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-yellow-100 dark:hover:bg-gray-700 group"
+                            className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-yellow-100 group"
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                className="icon icon-tabler icon-tabler-stars transition-all duration-150 icon icon-tabler icon-tabler-settings-filled flex-shrink-0 w-6 h-6 text-gray-500 dark:text-gray-400 group-hover:text-yellow-500 dark:group-hover:text-white"
+                                className="icon icon-tabler icon-tabler-stars transition-all duration-150 icon icon-tabler icon-tabler-settings-filled flex-shrink-0 w-6 h-6 text-gray-500 group-hover:text-yellow-500"
                                 width="24"
                                 height="24"
                                 viewBox="0 0 24 24"
@@ -127,11 +127,11 @@ export const SideBarLeft = () => {
                     <li>
                         <a
                             href="#"
-                            className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                            className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group"
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                className="icon icon-tabler icon-tabler-settings transition-all duration-150 icon icon-tabler icon-tabler-settings-filled flex-shrink-0 w-6 h-6 text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                                className="icon icon-tabler icon-tabler-settings transition-all duration-150 icon icon-tabler icon-tabler-settings-filled flex-shrink-0 w-6 h-6 text-gray-500 group-hover:text-gray-900"
                                 width="24"
                                 height="24"
                                 viewBox="0 0 24 24"
@@ -157,11 +157,11 @@ export const SideBarLeft = () => {
                     <li>
                         <a
                             href="#"
-                            className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                            className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group"
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                className="icon icon-tabler icon-tabler-logout flex-shrink-0 w-6 h-6 text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                                className="icon icon-tabler icon-tabler-logout flex-shrink-0 w-6 h-6 text-gray-500 group-hover:text-gray-900"
                                 width="24"
                                 height="24"
                                 viewBox="0 0 24 24"

@@ -1,4 +1,4 @@
-const stats = [
+/*const stats = [
     {
         icon: swords,
         topic: "Total Battles",
@@ -14,18 +14,26 @@ const stats = [
         topic: "Total Battles",
         amount: 10,
     },
-];
+];*/
 
-export const UserStats = ({color}) => {
+import {TextField} from "@radix-ui/themes";
+
+export const UserStats = ({id, category, value}) => {
     return (
-        <div className="bg-red-100 px-4 py-2 [calc(100%-16px)] md:w-[calc(50%-16px)] xl:w-[calc(25%-16px)]">
-            <div className="flex">
-                <div className="flex items-center bg-white max-h-[100%] overflow-hidden rounded-md"></div>
-                <div className="font-bold ml-2">
-                    <div className="text-base">10</div>
-                    <div className="font-light">Total Courses</div>
-                </div>
-            </div>
+        <div className="w-full">
+            <label htmlFor={id} className="font-bold text-gray-500 text-sm">
+                {category}
+            </label>
+            <TextField.Input
+                className="py-6 px-3 focus:shadow-xl bg-green-200 focus:shadow-green-100 border focus:border-green-500 cursor-not-allowed"
+                defaultValue={value}
+                type="text"
+                color="red"
+                id={id}
+                variant="soft"
+                radius="large"
+                disabled
+            />
         </div>
     );
 };

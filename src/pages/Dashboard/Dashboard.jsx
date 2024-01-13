@@ -13,11 +13,11 @@ export const Dashboard = () => {
     return (
         <div>
             <LoggedHeader />
-            <div className="container flex justify-center mx-auto">
+            <div className="container flex flex-col lg:flex-row mx-auto">
                 <SideBarLeft />
                 <div
-                    className={`px-4 transition-all duration-500 ${
-                        isSideBarActive ? "w-[800px] mx-auto" : "mx-auto"
+                    className={`px-4 transition-all duration-500 w-[100%] md:w-[800px] ${
+                        isSideBarActive ? "mx-auto" : ""
                     }`}
                 >
                     <div className="px-4 rounded-lg dark:border-gray-700">
@@ -26,7 +26,7 @@ export const Dashboard = () => {
                                 Home
                             </h2>
                             <p className="text-gray-600">
-                                See news and what's coming
+                                See what's new and what's coming
                             </p>
                         </div>
                         <div className="mb-6">
@@ -83,7 +83,7 @@ export const Dashboard = () => {
                         </div>
                         <div className="mb-6">
                             <h3 className="text-3xl font-bold text-red-700 mb-2">
-                                What Sets Us Apart?
+                                Why Choose Us?
                             </h3>
                             <ul class="max-w-md space-y-1 text-gray-500 list-disc list-inside dark:text-gray-400">
                                 <li>
@@ -95,16 +95,21 @@ export const Dashboard = () => {
                                     an exceptional place to learn.
                                 </li>
                                 <li>
-                                    Your Position on the Leaderboard: Conquer
-                                    the top of the leaderboard. Your
+                                    <span className="font-bold">
+                                        Your Position on the Leaderboard:
+                                    </span>{" "}
+                                    Conquer the top of the leaderboard. Your
                                     achievements inspire others and serve as
                                     proof of your language mastery!
                                 </li>
                                 <li>
-                                    Unlocked Achievements: Celebrate your
-                                    milestones and unlock achievements as you
-                                    progress. Each step is an accomplishment
-                                    bringing you closer to mastery.
+                                    <span className="font-bold">
+                                        Unlocked Achievements:
+                                    </span>{" "}
+                                    Celebrate your milestones and unlock
+                                    achievements as you progress. Each step is
+                                    an accomplishment bringing you closer to
+                                    mastery.
                                 </li>
                             </ul>
                         </div>

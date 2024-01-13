@@ -27,11 +27,11 @@ export const SideBarRight = () => {
     return (
         <aside
             id="cta-button-sidebar"
-            className={`absolute sm:fixed top-[90px] right-0 z-40 lg:w-[340px] bottom-0 transition-transform`}
+            className="block lg:absolute top-[90px] right-0 z-30 lg:w-[340px] bottom-0 transition-transform xl:bg-gray-50"
             aria-label="Sidebar"
         >
             <div className="h-full px-3 py-4 overflow-y-auto">
-                <ul className="h-full space-y-2 font-medium px-4 pt-8">
+                <ul className="h-full space-y-2 font-medium px-4 pt-8 flex flex-col justify-center xl:justify-start">
                     <li className="flex flex-col items-center justify-center">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"

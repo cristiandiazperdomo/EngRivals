@@ -1,70 +1,116 @@
-import {useState, useContext} from "react";
-import {ChallengeCard} from "../../components/Cards/ChallengeCard";
-import {Lobbies} from "../../components/Lobbies/Lobbies";
+import {useContext} from "react";
 import {LoggedHeader} from "../../components/LoggedHeader/LoggedHeader";
-import {SideBar} from "../../components/SideBar/SideBar";
+import {SideBarLeft} from "../../components/SideBarLeft/SideBarLeft";
 import {MyContext} from "../../context/AppContext";
-import {LoaderScreen} from "../../components/LoaderScreen/LoaderScreen";
+import {SideBarRight} from "../../components/SideBarRight/SideBarRight";
+import {Button} from "@radix-ui/themes";
+import swords from "../../assets/swords.svg";
+import {Link} from "react-router-dom";
 
 export const Dashboard = () => {
-    const [showLoaderScreen, setShowLoaderScreen] = useState(false);
     const {isSideBarActive} = useContext(MyContext);
-
-    const handleCreateLobby = () => {
-        setShowLoaderScreen(true);
-    };
 
     return (
         <div>
-            {showLoaderScreen && (
-                <LoaderScreen setShowLoaderScreen={setShowLoaderScreen} />
-            )}
             <LoggedHeader />
-            <SideBar />
-            <div
-                className={`px-4 transition-all duration-500 ${
-                    isSideBarActive ? "ml-0 sm:ml-64" : "container mx-auto"
-                }`}
-            >
-                <div className="px-4 rounded-lg dark:border-gray-700">
-                    <div className="my-12">
-                        <h2 className="text-3xl font-bold text-red-700">
-                            Group Challenges for A1
-                        </h2>
-                        <p className="text-gray-600">
-                            Welcome to group challenges, where you practice
-                            challenging other users
-                        </p>
-                    </div>
-                    <div className="flex flex-wrap gap-4">
-                        <ChallengeCard
-                            category="Groceries"
-                            videoUrl="https://i.imgur.com/Yq8xKOM.mp4"
-                            handleCreateLobby={handleCreateLobby}
-                        />
-                        <ChallengeCard
-                            category="Small Talk"
-                            videoUrl="https://i.imgur.com/os2iEWc.mp4"
-                            handleCreateLobby={handleCreateLobby}
-                        />
-                        <ChallengeCard
-                            category="Work"
-                            videoUrl="https://i.imgur.com/WZ7UKpl.mp4"
-                            handleCreateLobby={handleCreateLobby}
-                        />
-                        <ChallengeCard
-                            category="Vacations"
-                            videoUrl="https://i.imgur.com/e6B849D.mp4"
-                            handleCreateLobby={handleCreateLobby}
-                        />
-                    </div>
-                    <h3 className="text-3xl font-bold text-red-700 my-12">
-                        Lobbies
-                    </h3>
-                    <div className="my-12">
-                        <Lobbies handleCreateLobby={handleCreateLobby} />
+            <div className="container flex justify-center mx-auto">
+                <SideBarLeft />
+                <div
+                    className={`px-4 transition-all duration-500 ${
+                        isSideBarActive ? "w-[800px] mx-auto" : "mx-auto"
+                    }`}
+                >
+                    <div className="px-4 rounded-lg dark:border-gray-700">
+                        <div className="my-12 w-full">
+                            <h2 className="text-3xl font-bold text-red-700">
+                                Home
+                            </h2>
+                            <p className="text-gray-600">
+                                See news and what's coming
+                            </p>
+                        </div>
+                        <div className="mb-6">
+                            <h3 className="text-3xl font-bold text-red-700">
+                                Your Hub for Competitively Learning English!
+                            </h3>
+                            <p className="text-gray-700 my-6">
+                                At EngRivals, you don't just learn English; you
+                                master it competitively. Our platform offers you
+                                a unique experience designed for those aiming to
+                                excel in their English proficiency and stand out
+                                in any competitive environment.
+                            </p>
+                            <Link to="/groupchallenges">
+                                <Button size="4" className="bg-red-500">
+                                    <img src={swords} alt="sword" />
+                                    Start Now
+                                </Button>
+                            </Link>
+                        </div>
+                        <div className="my-12">
+                            <h3 className="text-3xl font-bold text-red-700 mb-2">
+                                What Sets Us Apart?
+                            </h3>
+                            <ul class="max-w-md space-y-1 text-gray-500 list-disc list-inside dark:text-gray-400">
+                                <li>
+                                    <span className="font-bold">
+                                        Daily Challenges:
+                                    </span>{" "}
+                                    Take on daily learning challenges that will
+                                    test your skills in grammar, vocabulary, and
+                                    comprehension. Earn points and improve your
+                                    position on our global leaderboard.
+                                </li>
+                                <li>
+                                    <span className="font-bold">
+                                        Live Competitions:
+                                    </span>{" "}
+                                    Participate in real-time competitions with
+                                    students from around the world. Test your
+                                    knowledge in simulated competitive
+                                    environments for a one-of-a-kind learning
+                                    experience.
+                                </li>
+                                <li>
+                                    <span className="font-bold">
+                                        Interactive Courses:
+                                    </span>{" "}
+                                    Our courses are crafted to keep you engaged
+                                    and motivated. You'll learn not just
+                                    effectively but also excitingly.
+                                </li>
+                            </ul>
+                        </div>
+                        <div className="mb-6">
+                            <h3 className="text-3xl font-bold text-red-700 mb-2">
+                                What Sets Us Apart?
+                            </h3>
+                            <ul class="max-w-md space-y-1 text-gray-500 list-disc list-inside dark:text-gray-400">
+                                <li>
+                                    <span className="font-bold">
+                                        Elite Community:
+                                    </span>{" "}
+                                    Connect with other serious learners and
+                                    expert teachers. Together, we make EngRivals
+                                    an exceptional place to learn.
+                                </li>
+                                <li>
+                                    Your Position on the Leaderboard: Conquer
+                                    the top of the leaderboard. Your
+                                    achievements inspire others and serve as
+                                    proof of your language mastery!
+                                </li>
+                                <li>
+                                    Unlocked Achievements: Celebrate your
+                                    milestones and unlock achievements as you
+                                    progress. Each step is an accomplishment
+                                    bringing you closer to mastery.
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
+                <SideBarRight />
             </div>
         </div>
     );

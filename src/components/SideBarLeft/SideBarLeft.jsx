@@ -1,11 +1,10 @@
 import {useContext} from "react";
-import {Brand} from "../../components/Brand/Brand";
+import {Brand} from "../Brand/Brand";
 import {MyContext} from "../../context/AppContext";
+import {Link} from "react-router-dom";
 
-export const SideBar = () => {
+export const SideBarLeft = () => {
     const {toggleSideBar, isSideBarActive} = useContext(MyContext);
-
-    console.log(isSideBarActive, "isSideBarActive in Sidear");
 
     return (
         <aside
@@ -15,33 +14,33 @@ export const SideBar = () => {
             }`}
             aria-label="Sidebar"
         >
-            <div className="h-full px-3 py-4 overflow-y-auto bg-gray-50">
-                <ul className="space-y-2 font-medium">
-                    <li className="pb-2 pt-3 flex justify-between items-center">
-                        <Brand />
-                        <svg
-                            onClick={toggleSideBar}
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="icon icon-tabler icon-tabler-arrow-bar-left text-gray-500 hover:text-gray-900 cursor-pointer transition-all duration-150"
-                            width="28"
-                            height="28"
-                            viewBox="0 0 24 24"
-                            stroke-width="2"
-                            stroke="currentColor"
-                            fill="none"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        >
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                            <path d="M4 12l10 0" />
-                            <path d="M4 12l4 4" />
-                            <path d="M4 12l4 -4" />
-                            <path d="M20 4l0 16" />
-                        </svg>
-                    </li>
+            <div className="h-full w-full px-3 py-4 overflow-y-auto bg-gray-50 grid justify-center">
+                <div className="pb-2 pt-3 space-x-4 flex justify-between items-center self-start">
+                    <Brand />
+                    <svg
+                        onClick={toggleSideBar}
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="icon icon-tabler icon-tabler-arrow-bar-left text-gray-500 hover:text-gray-900 cursor-pointer transition-all duration-150"
+                        width="28"
+                        height="28"
+                        viewBox="0 0 24 24"
+                        strokeWidth="2"
+                        stroke="currentColor"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    >
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M4 12l10 0" />
+                        <path d="M4 12l4 4" />
+                        <path d="M4 12l4 -4" />
+                        <path d="M20 4l0 16" />
+                    </svg>
+                </div>
+                <ul className="space-y-2 font-medium min-w-[200px] -mt-40">
                     <li>
-                        <a
-                            href="#"
+                        <Link
+                            to="/dashboard"
                             className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
                         >
                             <svg
@@ -64,11 +63,11 @@ export const SideBar = () => {
                                 <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
                             </svg>
                             <span className="ms-4">Dashboard</span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a
-                            href="#"
+                        <Link
+                            to="/groupchallenges"
                             className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-red-100 hover:text-red-600 dark:hover:bg-gray-700 group"
                         >
                             <svg
@@ -92,7 +91,7 @@ export const SideBar = () => {
                             <span className="flex-1 ms-4 whitespace-nowrap hover:text-red-600">
                                 Warzone
                             </span>
-                        </a>
+                        </Link>
                     </li>
                     <li>
                         <a

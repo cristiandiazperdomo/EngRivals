@@ -1,8 +1,11 @@
 import {useContext} from "react";
+import {useLocation} from "react-router-dom";
 import {MyContext} from "../../context/AppContext";
 
 export const LoggedHeader = () => {
     const {toggleSideBar, isSideBarActive} = useContext(MyContext);
+
+    const location = useLocation();
 
     return (
         <header className={`bg-gray-50`}>
@@ -56,7 +59,9 @@ export const LoggedHeader = () => {
                                 <path d="M3 12l2 0" />
                                 <path d="M19 12l2 0" />
                             </svg>
-                            <span className="mt-1">Dashboard</span>
+                            <span className="mt-1 capitalize">
+                                {location.pathname.replace("/", "")}
+                            </span>
                         </div>
                         <button className="flex items-center text-gray-500 text-3xl group">
                             ...

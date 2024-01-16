@@ -53,7 +53,7 @@ export const Dashboard = () => {
                             </h3>
                             <ul className="max-w-md xl:max-w-lg space-y-1 text-gray-500 list-disc list-inside dark:text-gray-400">
                                 <li>
-                                    <span className="font-bold">
+                                    <span className="font-bold text-gray-700">
                                         Daily Challenges:
                                     </span>{" "}
                                     Take on daily learning challenges that will
@@ -62,7 +62,7 @@ export const Dashboard = () => {
                                     position on our global leaderboard.
                                 </li>
                                 <li>
-                                    <span className="font-bold">
+                                    <span className="font-bold text-gray-700">
                                         Live Competitions:
                                     </span>{" "}
                                     Participate in real-time competitions with
@@ -72,7 +72,7 @@ export const Dashboard = () => {
                                     experience.
                                 </li>
                                 <li>
-                                    <span className="font-bold">
+                                    <span className="font-bold text-gray-700">
                                         Interactive Courses:
                                     </span>{" "}
                                     Our courses are crafted to keep you engaged
@@ -87,7 +87,7 @@ export const Dashboard = () => {
                             </h3>
                             <ul className="max-w-md xl:max-w-lg space-y-1 text-gray-500 list-disc list-inside dark:text-gray-400">
                                 <li>
-                                    <span className="font-bold">
+                                    <span className="font-bold text-gray-700">
                                         Elite Community:
                                     </span>{" "}
                                     Connect with other serious learners and
@@ -95,7 +95,7 @@ export const Dashboard = () => {
                                     an exceptional place to learn.
                                 </li>
                                 <li>
-                                    <span className="font-bold">
+                                    <span className="font-bold text-gray-700">
                                         Your Position on the Leaderboard:
                                     </span>{" "}
                                     Conquer the top of the leaderboard. Your
@@ -103,7 +103,7 @@ export const Dashboard = () => {
                                     proof of your language mastery!
                                 </li>
                                 <li>
-                                    <span className="font-bold">
+                                    <span className="font-bold text-gray-700">
                                         Unlocked Achievements:
                                     </span>{" "}
                                     Celebrate your milestones and unlock

@@ -1,8 +1,10 @@
-import {useContext} from "react";
+import {useState, useContext} from "react";
 import {useLocation} from "react-router-dom";
 import {MyContext} from "../../context/AppContext";
+import {LoggedHeaderDropdown} from "../LoggedHeaderDropdown/LoggedHeaderDropdown";
 
 export const LoggedHeader = () => {
+    const [showDropdown, setShowDropdown] = useState(false);
     const {toggleSideBar, isSideBarActive} = useContext(MyContext);
 
     const location = useLocation();
@@ -63,13 +65,31 @@ export const LoggedHeader = () => {
                                 {location.pathname.replace("/", "")}
                             </span>
                         </div>
-                        <button className="flex items-center text-gray-500 text-3xl group">
-                            ...
+                        <button
+                            className="relative flex items-center text-gray-500 text-3xl group"
+                            onClick={() => setShowDropdown(!showDropdown)}
+                        >
+                            <svg
+                                className="transition-all duration-100 w-3 h-3 mr-1 text-gray-500 group-hover:text-gray-900"
+                                aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 10 6"
+                            >
+                                <path
+                                    stroke="currentColor"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="m1 1 4 4 4-4"
+                                />
+                            </svg>
                             <img
                                 src="https://tailwindui.com/img/avatar-3.jpg"
                                 className="rounded-full ml-0.5 w-11 group-hover:shadow-xl group-hover:shadow-gray-300"
                                 alt="profile"
                             />
+                            <LoggedHeaderDropdown showDropdown={showDropdown} />
                         </button>
                     </div>
                     <div className="rounded-lg dark:border-gray-700"></div>

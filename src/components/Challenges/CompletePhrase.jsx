@@ -25,12 +25,12 @@ export const CompletePhrase = () => {
     return (
         <div className="flex flex-col w-full items-center justify-center">
             <PhraseCard title={phrase} instruction="Complete these phrase" />
-            <div className="w-[540px] h-[400px] space-y-14">
+            <div className="pb-2 sm:pb-0 w-full h-100 sm:h-[360px] space-y-14">
                 <div className="flex flex-wrap gap-2 min-h-[124px] border-b-2 pb-2">
                     {userPhrase.map((word, index) => (
                         <span
                             key={index}
-                            className="bg-transparent p-3 border rounded-full w-100 max-h-12 border-2 cursor-pointer"
+                            className="bg-transparent p-2 sm:p-3 border rounded-full w-100 max-h-12 border-2 cursor-pointer"
                             onClick={() => handleRemoveFromUserPhrase(index)}
                         >
                             {word.word}

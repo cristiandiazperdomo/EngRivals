@@ -1,10 +1,12 @@
 export const PhraseCard = ({title, instruction}) => {
     return (
-        <div className="text-center flex flex-col justify-center items-center my-4 max-w-[540px]">
-            <header className="mt-0 my-12">
-                <p className="text-3xl font-bold">{instruction}</p>
+        <div className="text-center flex flex-col justify-center sm:items-center my-4 max-w-[540px]">
+            <header className="mt-0 my-3 sm:my-12">
+                <p className="text-right sm:text-center text-xl sm:text-3xl font-bold">
+                    {instruction}
+                </p>
             </header>
-            <div className="flex flex-col items-start w-full bg-yellow-100 rounded-xl px-4 py-12">
+            <div className="flex flex-col items-start w-full bg-yellow-100 rounded-xl p-4 sm:py-12">
                 <p className="text-xl font-bold flex mx-auto">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"

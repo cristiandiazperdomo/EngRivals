@@ -9,15 +9,19 @@ export const Translate = () => {
     const [useButtons, setUseButtons] = useState(false);
 
     return (
-        <div className="flex flex-col justify-between -mt-44">
-            <div className="mx-4 flex flex-col items-center">
+        <div className="flex flex-col justify-between mt-12 sm:-mt-20 md:-mt-44">
+            <div className="flex flex-col items-center">
                 <div className="flex justify-center items-center text-center">
-                    <div className="max-w-[600px]">
+                    <div className="max-w-[540px]">
                         <PhraseCard
                             title={phrase}
-                            instruction="Translate theses phrases in to English"
+                            instruction={
+                                useButtons
+                                    ? "Translate this phrase in to English"
+                                    : "Choose the Right Option"
+                            }
                         />
-                        {!useButtons ? (
+                        {useButtons ? (
                             <Textarea />
                         ) : (
                             <ul className="mt-4 space-y-2">

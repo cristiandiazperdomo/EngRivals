@@ -19,7 +19,7 @@ export const Word = ({
 
     return (
         <span
-            className={`p-3 border rounded-full w-100 border-2 ${
+            className={`p-2 sm:p-3 border rounded-full w-100 border-2 ${
                 handleIsWordUsed() ? "cursor-default" : "cursor-pointer"
             }`}
             onClick={handleClick}

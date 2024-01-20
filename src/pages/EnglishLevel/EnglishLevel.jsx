@@ -1,4 +1,7 @@
 import {useState} from "react";
+import {useSelector, useDispatch} from "react-redux";
+import {useNavigate} from "react-router-dom";
+import {setUserEnglishLevel} from "../../redux/actions/userActions";
 import {Button} from "@radix-ui/themes";
 import {EnglishLevelCard} from "../../components/Cards/EnglishLevelCard";
 
@@ -14,12 +17,28 @@ const levels = [
 export const EnglishLevel = () => {
     const [showLevel, setShowLevel] = useState(0);
 
+    const dispatch = useDispatch();
+    const {userInfo} = useSelector((state) => state.userReducer);
+
+    const navigate = useNavigate();
+
     const handleNextLevel = () => {
         if (showLevel < 5) setShowLevel(showLevel + 1);
     };
 
     const handlePrevLevel = () => {
         if (showLevel > 0) setShowLevel(showLevel - 1);
+    };
+
+    const handleSetUserEnglishLevel = () => {
+        const requestBody = {
+            ...userInfo,
+            level_id_level: {
+                idLevel: showLevel + 1,
+            },
+        };
+
+        dispatch(setUserEnglishLevel(requestBody, navigate));
     };
 
     return (
@@ -53,6 +72,7 @@ export const EnglishLevel = () => {
                     <div className="border border-2 border-gray-200 rounded-xl flex p-1 py-12 sm:p-4 cursor-pointer w-[240px] sm:w-[460px]">
                         {levels.map((level, index) => (
                             <EnglishLevelCard
+                                key={level}
                                 level={level.level}
                                 description={level.description}
                                 showLevel={showLevel}
@@ -81,7 +101,12 @@ export const EnglishLevel = () => {
                         <path d="M13 6l6 6" />
                     </svg>
                 </div>
-                <Button className="mt-12 mx-14" size="4" color="red">
+                <Button
+                    className="mt-12 mx-14"
+                    size="4"
+                    color="red"
+                    onClick={handleSetUserEnglishLevel}
+                >
                     Continuar
                 </Button>
             </div>

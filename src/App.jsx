@@ -8,6 +8,8 @@ import {EnglishLevel} from "./pages/EnglishLevel/EnglishLevel.jsx";
 import {MyContext} from "./context/AppContext.js";
 import {useInitialState} from "./hooks/useInitialState.js";
 import {BrowserRouter} from "react-router-dom";
+import {Provider} from "react-redux";
+import store from "./redux/store.js";
 
 import {Theme} from "@radix-ui/themes";
 import {Dashboard} from "./pages/Dashboard/Dashboard.jsx";
@@ -16,7 +18,7 @@ export default function App() {
     const initialState = useInitialState();
 
     return (
-        <>
+        <Provider store={store}>
             <MyContext.Provider value={initialState}>
                 <BrowserRouter>
                     <Theme
@@ -50,6 +52,6 @@ export default function App() {
                     </Theme>
                 </BrowserRouter>
             </MyContext.Provider>
-        </>
+        </Provider>
     );
 }

@@ -1,6 +1,6 @@
 const initialState = {
-    time: 123,
-    challenge: {},
+    time: 200,
+    challenge: null,
 };
 
 export const challengeReducer = (state = initialState, action) => {

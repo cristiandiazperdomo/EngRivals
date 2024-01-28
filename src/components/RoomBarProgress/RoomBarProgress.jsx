@@ -1,9 +1,39 @@
+import {useEffect, useState} from "react";
+import {useSelector} from "react-redux";
+
 export const RoomBarProgress = () => {
+    const [numberOfAnsweredQuestions, setNumberOfAnsweredQuestions] =
+        useState(0);
+
+    const {challenge} = useSelector((state) => state.challengeReducer);
+
+    useEffect(() => {
+        if (challenge !== null || !(challenge instanceof Promise)) {
+            let counter = 0;
+
+            const loggedUserId = "1";
+
+            challenge?.questions?.forEach((question) => {
+                question.answers?.forEach((answer) => {
+                    if (answer.userId === loggedUserId) counter++;
+                });
+            });
+
+            setNumberOfAnsweredQuestions(counter);
+        }
+    }, [challenge]);
+
     return (
         <div className="mx-0 sm:mx-4 w-full h-6 bg-gray-200 rounded-full">
             <div
-                className="h-6 bg-gradient-to-b from-yellow-500 to-yellow-600 rounded-full"
-                style={{width: "45%"}}
+                className="transition-all duration-500 h-6 bg-black rounded-full"
+                style={{
+                    width:
+                        Math.floor(
+                            (numberOfAnsweredQuestions * 100) /
+                                challenge?.questions?.length
+                        ) + "%",
+                }}
             ></div>
         </div>
     );

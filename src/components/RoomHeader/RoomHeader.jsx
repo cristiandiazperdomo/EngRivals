@@ -2,16 +2,7 @@ import {useEffect, useState} from "react";
 import {RoomBarProgress} from "../RoomBarProgress/RoomBarProgress";
 
 export const RoomHeader = () => {
-    const [stars, setStars] = useState(9999);
-
-    useEffect(() => {
-        if (stars > 0) {
-            const idTimeout = setTimeout(() => {
-                setStars(stars - 1);
-            }, 30);
-            return () => clearTimeout(idTimeout);
-        }
-    }, [stars]);
+    const [stars, setStars] = useState(999);
 
     return (
         <header className="w-full md:w-[800px] lg:w-[1000px] xl:w-[1200px] mx-auto">

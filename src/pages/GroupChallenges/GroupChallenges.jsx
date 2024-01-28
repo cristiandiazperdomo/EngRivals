@@ -5,13 +5,39 @@ import {LoggedHeader} from "../../components/LoggedHeader/LoggedHeader";
 import {SideBarLeft} from "../../components/SideBarLeft/SideBarLeft";
 import {MyContext} from "../../context/AppContext";
 import {LoaderScreen} from "../../components/LoaderScreen/LoaderScreen";
+import {useNavigate} from "react-router-dom";
+import {useDispatch, useSelector} from "react-redux";
+import {createChallenge} from "../../redux/actions/challengeActions";
+
+const challengeCards = [
+    {
+        category: "Small Talk",
+        videoUrl: "https://i.imgur.com/os2iEWc.mp4",
+    },
+    {
+        category: "Work",
+        videoUrl: "https://i.imgur.com/WZ7UKpl.mp4",
+    },
+    {
+        category: "Groceries",
+        videoUrl: "https://i.imgur.com/Yq8xKOM.mp4",
+    },
+    {
+        category: "Vacations",
+        videoUrl: "https://i.imgur.com/e6B849D.mp4",
+    },
+];
 
 export const GroupChallenges = () => {
     const [showLoaderScreen, setShowLoaderScreen] = useState(false);
     const {isSideBarActive} = useContext(MyContext);
 
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
     const handleCreateLobby = () => {
         setShowLoaderScreen(true);
+        dispatch(createChallenge(navigate));
     };
 
     return (
@@ -36,28 +62,16 @@ export const GroupChallenges = () => {
                             challenging other users
                         </p>
                     </div>
-                    {/*<div className="flex flex-wrap gap-4">
-                        <ChallengeCard
-                            category="Groceries"
-                            videoUrl="https://i.imgur.com/Yq8xKOM.mp4"
-                            handleCreateLobby={handleCreateLobby}
-                        />
-                        <ChallengeCard
-                            category="Small Talk"
-                            videoUrl="https://i.imgur.com/os2iEWc.mp4"
-                            handleCreateLobby={handleCreateLobby}
-                        />
-                        <ChallengeCard
-                            category="Work"
-                            videoUrl="https://i.imgur.com/WZ7UKpl.mp4"
-                            handleCreateLobby={handleCreateLobby}
-                        />
-                        <ChallengeCard
-                            category="Vacations"
-                            videoUrl="https://i.imgur.com/e6B849D.mp4"
-                            handleCreateLobby={handleCreateLobby}
-                        />
-            </div>*/}
+                    <div className="flex flex-wrap gap-4">
+                        {challengeCards.map((challenge) => (
+                            <ChallengeCard
+                                key={challenge.category}
+                                category={challenge.category}
+                                videoUrl={challenge.videoUrl}
+                                handleCreateLobby={handleCreateLobby}
+                            />
+                        ))}
+                    </div>
                     <h3 className="text-3xl font-bold text-red-700 my-12">
                         Lobbies
                     </h3>

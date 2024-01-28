@@ -3,18 +3,18 @@ import {PhraseCard} from "../Cards/PhraseCard";
 import {QuizOptionButton} from "../Button/QuizOptionButton";
 import {Textarea} from "../Textarea/Textarea";
 
-const phrase = "Hello. How are you? Are you Doctor Esteban? Yes, i am.";
+const firstLetter = ["a", "b", "c"];
 
-export const Translate = () => {
+export const Translate = ({optionsList, title, options}) => {
     const [useButtons, setUseButtons] = useState(false);
 
     return (
         <div className="flex flex-col justify-between mt-12 sm:-mt-20 md:-mt-44">
             <div className="flex flex-col items-center">
                 <div className="flex justify-center items-center text-center">
-                    <div className="max-w-[540px]">
+                    <div className="w-full sm:w-[540px]">
                         <PhraseCard
-                            title={phrase}
+                            title={title}
                             instruction={
                                 useButtons
                                     ? "Translate this phrase in to English"
@@ -24,22 +24,15 @@ export const Translate = () => {
                         {useButtons ? (
                             <Textarea />
                         ) : (
-                            <ul className="mt-4 space-y-2">
-                                <QuizOptionButton
-                                    optionLetter="a"
-                                    content="¿Dónde están los parques más cercanos aquí en Nueva
-                        York, EE. UU.?"
-                                />
-                                <QuizOptionButton
-                                    optionLetter="b"
-                                    content="¿Cuáles son los parques más cercanos en esta zona de
-                                Nueva York, Estados Unidos?"
-                                />
-                                <QuizOptionButton
-                                    optionLetter="c"
-                                    content="¿Dónde puedo encontrar los parques más cercanos aquí
-                        en Nueva York, USA?"
-                                />
+                            <ul className="mt-4 space-y-2" ref={optionsList}>
+                                {options?.map((option, index) => (
+                                    <QuizOptionButton
+                                        key={option.id}
+                                        optionId={option.id}
+                                        optionLetter={firstLetter[index]}
+                                        content={option.name}
+                                    />
+                                ))}
                             </ul>
                         )}
                     </div>

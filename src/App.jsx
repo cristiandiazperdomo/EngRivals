@@ -14,6 +14,7 @@ import store from "./redux/store.js";
 import {Theme} from "@radix-ui/themes";
 import {Dashboard} from "./pages/Dashboard/Dashboard.jsx";
 import {Profile} from "./pages/Profile/Profile.jsx";
+import {TestCompleted} from "./pages/TestCompleted/TestCompleted.jsx";
 export default function App() {
     const initialState = useInitialState();
 
@@ -39,7 +40,10 @@ export default function App() {
                                 path="/englishlevel"
                                 element={<EnglishLevel />}
                             ></Route>
-                            <Route path="/rooms" element={<Rooms />}></Route>
+                            <Route
+                                path="/rooms/:id"
+                                element={<Rooms />}
+                            ></Route>
                             <Route
                                 path="/groupchallenges"
                                 element={<GroupChallenges />}
@@ -47,6 +51,10 @@ export default function App() {
                             <Route
                                 path="/dashboard"
                                 element={<Dashboard />}
+                            ></Route>
+                            <Route
+                                path="/completed/:id"
+                                element={<TestCompleted />}
                             ></Route>
                         </Routes>
                     </Theme>

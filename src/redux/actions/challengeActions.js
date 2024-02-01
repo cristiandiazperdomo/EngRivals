@@ -1,8 +1,22 @@
 export const createChallenge = (navigate) => {
     return async (dispatch) => {
         try {
+            const isTheBrowserCompatibleWithAudio =
+                window.navigator.userAgentData.brands.some(
+                    (brand) => brand.brand === "Brave"
+                );
+
             const response = await fetch(
-                "http://localhost:8080/v1/api/challenges/4/6"
+                "http://localhost:8080/v1/api/challenges/1/2",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        isTheBrowserCompatibleWithAudio,
+                    }),
+                }
             );
 
             const data = await response.json();
@@ -51,7 +65,6 @@ export const saveUserAnswer = (
 
             dispatch(getChallengeSuccess(await response.json()));
             setShowResult(true);
-            console.log("setShowResult");
         } catch (error) {
             console.log(error);
         }

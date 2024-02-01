@@ -9,7 +9,7 @@ export const SideBarLeft = () => {
     return (
         <aside
             id="cta-button-sidebar"
-            className={`absolute sm:fixed top-0 left-0 z-40 w-64 bottom-0 transition-transform ${
+            className={`absolute sm:fixed top-0 left-0 z-40 w-64 bottom-0 transition-transform duration-500 ${
                 isSideBarActive ? "translate-x-0" : "-translate-x-full"
             }`}
             aria-label="Sidebar"
@@ -20,7 +20,7 @@ export const SideBarLeft = () => {
                     <svg
                         onClick={toggleSideBar}
                         xmlns="http://www.w3.org/2000/svg"
-                        className="icon icon-tabler icon-tabler-arrow-bar-left text-gray-500 hover:text-gray-900 cursor-pointer transition-all duration-150"
+                        className="icon icon-tabler icon-tabler-arrow-bar-left text-gray-500 hover:text-gray-900 cursor-pointer transition-all duration-150 sm:hidden"
                         width="28"
                         height="28"
                         viewBox="0 0 24 24"

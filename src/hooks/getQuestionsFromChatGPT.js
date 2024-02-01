@@ -7,41 +7,32 @@ const createRequest = (category, level) => {
         messages: [
             {
                 role: "system",
-                content:
-                    "Eres un profesor de inglés de la universidad de cambricreateRequestdge, devuelve un array de objetos siendo fiel al ejemplo, ya que así se espera la información cualquier otro texto romperá el código",
+                content: `Eres un profesor de inglés de la universidad de cambridge, devuelve un array de objetos siendo fiel al ejemplo y la dificultad propuesta por nivel ${level}, ya que así se espera la información cualquier otro texto romperá el código`,
             },
             {
                 role: "user",
-                content: `20 frases en ingles con más de una palabra para un nivel ${level} en inglés, Devuelve un array con cada pregunta en forma de objeto tendra tres opciones. el array debe incluir una frase en español cada tanto no incluyas la traducción de cada frase en inglés como otra pregunta. Ten en cuenta un nivel ${level} dentro de la categoria ${category}
+                content: `
+                5 texto largos como title en inglés con más de una palabra para un nivel B1 de inglés, 
                     ejemplo,
                         [
                             {
-                                "title": "How much?"},
+                                "title": "On weekends, I spend time with friends, going to a cafe or watching a movie. I enjoy cooking and trying new recipes. Last month, I visited a museum, learning about local history. How do you spend your weekends?,
                                 "options": [ // marca la opción correcta con true
                                     {
-                                        "name": "Eres de aquí", 
-                                        "isCorrect": false
-                                    },
-                                    {
-                                        "name": "Estare en ocupado",
-                                        "isCorrect": false
-                                    }, {
-                                        "name": "¿Cuanto cuesta?",
+                                        "name": "new recipes",  // una parte del texto de title no mas de un 4 palabras, no agregas mas de 4 palabras
                                         "isCorrect": true
-                                    }
+                                    }                                
                                 ]
+                                "typeOfExcercise": "long text"
                             }
-                    ].
-                    ¡Las frases de nivel ${level} no deben estar incompletas!, no debe existir texto entre "[]" ni indicando acciones de tipo completar aquí.
+                        ].
+                    ¡Las frases de nivel B2 no deben estar incompletas!, no debe existir texto entre "[]" ni "..." ni indicando acciones de tipo completar aquí porque explotara el código.
                 `,
             },
         ],
     };
 };
 export const callOpenAiApi = async () => {
-    getManual();
-
-    return;
     let levelsCounter = 0;
     let categoriesCounter = 0;
 
@@ -78,6 +69,7 @@ export const callOpenAiApi = async () => {
                 saveQuestionIntoDatabase({
                     title: element.title,
                     options: element.options,
+                    typeOfExcercise: element.typeOfExcercise,
                     categoryEntity: {
                         id_category: categoriesCounter + 1,
                     },
@@ -123,6 +115,7 @@ const getManual = async () => {
             saveQuestionIntoDatabase({
                 title: element.title,
                 options: element.options,
+                typeOfExcercise: element.typeOfExcercise,
                 categoryEntity: {
                     id_category: 3,
                 },

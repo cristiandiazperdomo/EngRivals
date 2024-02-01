@@ -1,6 +1,6 @@
 export const PhraseCard = ({title, instruction}) => {
     return (
-        <div className="text-center flex flex-col justify-center sm:items-center my-4 max-w-[540px]">
+        <div className="text-center flex flex-col justify-center sm:items-center my-4 max-w-[540px] w-full">
             <header className="mt-0 my-3 sm:my-12">
                 <p className="text-right sm:text-center text-xl sm:text-3xl font-bold">
                     {instruction}

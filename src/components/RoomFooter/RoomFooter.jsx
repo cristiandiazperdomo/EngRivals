@@ -40,7 +40,7 @@ export const RoomFooter = ({isRight, showResult, submit, next, skip, time}) => {
                         Skip
                     </Button>
                 )}
-                <Timer time={time} />
+                <Timer />
                 <div className="sm:flex sm:hidden">
                     <RoomBarProgress />
                 </div>

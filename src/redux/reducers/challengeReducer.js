@@ -1,5 +1,4 @@
 const initialState = {
-    time: 200,
     challenge: null,
 };
 

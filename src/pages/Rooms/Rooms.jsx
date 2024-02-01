@@ -10,6 +10,7 @@ import {
 } from "../../redux/actions/challengeActions";
 import {useDispatch, useSelector} from "react-redux";
 import {useNavigate, useParams} from "react-router-dom";
+import {OpenQuestion} from "../../components/Challenges/OpenQuestion";
 
 export const Rooms = () => {
     const [currentQuestion, setCurrentQuestion] = useState(null);
@@ -17,9 +18,10 @@ export const Rooms = () => {
     const [showResult, setShowResult] = useState(false);
 
     const optionsList = useRef();
+    const userPhraseRef = useRef();
 
     const {userInfo} = useSelector((state) => state.userReducer);
-    const {time, challenge} = useSelector((state) => state.challengeReducer);
+    const {challenge} = useSelector((state) => state.challengeReducer);
     const dispatch = useDispatch();
 
     const navigate = useNavigate();
@@ -87,6 +89,7 @@ export const Rooms = () => {
             areThereMoreQuestions();
 
         if (!areThere) return;
+        if (indexesOfNotAnsweredsQuestions.length <= 1) return;
 
         const numberOfFreeIndexes = indexesOfNotAnsweredsQuestions.length;
 
@@ -99,7 +102,13 @@ export const Rooms = () => {
                 .id === currentQuestion.id
         );
 
-        setCurrentQuestion(challenge.questions[getRandomNumber]);
+        setCurrentQuestion(
+            challenge.questions[indexesOfNotAnsweredsQuestions[getRandomNumber]]
+        );
+
+        setCurrentQuestionIndex(
+            indexesOfNotAnsweredsQuestions[getRandomNumber]
+        );
     };
 
     const isThereAnOptionSelected = () => {
@@ -121,18 +130,14 @@ export const Rooms = () => {
         };
     };
 
-    const handleSaveAnswer = () => {
+    const handleGetTranslationAnswer = () => {
         const {isThere, optionId} = isThereAnOptionSelected();
 
-        if (!isThere || challenge === null) return;
+        if (!isThere || challenge === null) return null;
 
-        const question = challenge?.questions?.find((question) =>
-            question.options.some((option) => option.id === optionId)
-        );
+        const questionWithAnswer = structuredClone(currentQuestion);
 
-        const questionWithAnswer = structuredClone(question);
-
-        const option = question?.options?.find(
+        const option = questionWithAnswer?.options?.find(
             (option) => option.id === optionId
         );
 
@@ -142,6 +147,67 @@ export const Rooms = () => {
                 userId: 1,
             },
         ];
+
+        return questionWithAnswer;
+    };
+
+    const handleWritingQuestion = () => {
+        let completeAnswer = "";
+
+        if (userPhraseRef.current?.childNodes?.length === 0) return null;
+
+        userPhraseRef.current.childNodes.forEach(
+            (word) => (completeAnswer += " " + word.textContent)
+        );
+
+        const questionWithAnswer = structuredClone(currentQuestion);
+
+        questionWithAnswer.answers = [
+            {
+                answer: completeAnswer.slice(1, completeAnswer.length),
+                userId: 1,
+            },
+        ];
+
+        return questionWithAnswer;
+    };
+
+    const handleGetOpenQuestionAnswer = () => {
+        const {isThere, optionId} = isThereAnOptionSelected();
+
+        if (!isThere || challenge === null) return null;
+
+        const questionWithAnswer = structuredClone(currentQuestion);
+
+        const option = questionWithAnswer?.options?.find(
+            (option) => option.id === optionId
+        );
+
+        if (option?.name?.length === 0 || option?.name === undefined)
+            return null;
+
+        questionWithAnswer.answers = [
+            {
+                answer: option?.name,
+                userId: 1,
+            },
+        ];
+
+        return questionWithAnswer;
+    };
+
+    const handleSaveAnswer = () => {
+        let questionWithAnswer = null;
+
+        if (currentQuestion.typeOfExercise === "translation") {
+            questionWithAnswer = handleGetTranslationAnswer();
+        } else if (currentQuestion.typeOfExercise === "open question") {
+            questionWithAnswer = handleGetOpenQuestionAnswer();
+        } else if (currentQuestion.typeOfExercise === "writing") {
+            questionWithAnswer = handleWritingQuestion();
+        }
+
+        if (questionWithAnswer === null) return;
 
         dispatch(saveUserAnswer(questionWithAnswer, id, setShowResult));
     };
@@ -158,6 +224,11 @@ export const Rooms = () => {
                 areThereMoreQuestions();
 
             if (currentQuestion === null) {
+                if (!areThere) {
+                    navigate("/completed/" + id);
+                    return;
+                }
+
                 const getRandomNumber = createRandomNumber(
                     indexesOfNotAnsweredsQuestions.length,
                     0
@@ -175,6 +246,25 @@ export const Rooms = () => {
         }
     }, [challenge]);
 
+    useEffect(() => {
+        if (
+            challenge !== null &&
+            !(challenge instanceof Promise) &&
+            currentQuestion !== null
+        ) {
+            const foundedQuestionById = challenge.questions.find(
+                (question) => question.id === currentQuestion.id
+            );
+
+            if (
+                currentQuestion.answers?.length !==
+                foundedQuestionById?.answers?.length
+            ) {
+                setCurrentQuestion(foundedQuestionById);
+            }
+        }
+    }, [challenge]);
+
     return (
         <div className="flex flex-col justify-between min-h-screen">
             <div className="hidden for now">
@@ -183,21 +273,36 @@ export const Rooms = () => {
             <div className="hidden sm:flex">
                 <RoomHeader />
             </div>
-            <div className="mx-auto max-w-[540px]">
+            <div className="mx-auto max-w-[540px] w-full">
                 <div className="flex flex-col justify-between items-center mx-4 sm:mx-0">
-                    {/*
-                    <CompletePhrase />
-                    <Translate
-                        title={currentQuestion?.title}
-                        options={currentQuestion?.options}
-                        optionsList={optionsList}
-                    />
-    */}
+                    {currentQuestion?.typeOfExercise === "translation" && (
+                        <Translate
+                            currentQuestion={currentQuestion}
+                            title={currentQuestion?.title}
+                            options={currentQuestion?.options}
+                            optionsList={optionsList}
+                            useCard={true}
+                        />
+                    )}
+                    {currentQuestion?.typeOfExercise === "writing" && (
+                        <CompletePhrase
+                            title={currentQuestion?.title}
+                            phrase={currentQuestion?.options[0]?.name}
+                            userPhraseRef={userPhraseRef}
+                        />
+                    )}
+                    {currentQuestion?.typeOfExercise === "open question" && (
+                        <OpenQuestion
+                            currentQuestion={currentQuestion}
+                            optionsList={optionsList}
+                            useCard={false}
+                        />
+                    )}
                 </div>
             </div>
             <RoomFooter
                 isRight={
-                    challenge?.questions[currentQuestionIndex]?.answers?.find(
+                    currentQuestion?.answers?.find(
                         (answer) => answer.userId === "1"
                     )?.isCorrect
                 }
@@ -205,7 +310,6 @@ export const Rooms = () => {
                 submit={handleSaveAnswer}
                 next={handleGetNextQuestion}
                 skip={handleSkipToNextQuestion}
-                time={time}
             />
         </div>
     );

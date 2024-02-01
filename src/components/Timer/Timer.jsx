@@ -1,12 +1,54 @@
 import {useEffect, useState} from "react";
+import {useSelector} from "react-redux";
+import {useNavigate, useParams} from "react-router-dom";
 
-export const Timer = ({time}) => {
-    const [seconds, setSeconds] = useState(time);
+export const Timer = () => {
+    const [seconds, setSeconds] = useState(undefined);
     const [minutes, setMinutes] = useState(0);
     const [secondsInFormat, setSecondsInFormat] = useState(0);
 
+    const {challenge} = useSelector((state) => state.challengeReducer);
+
+    const navigate = useNavigate();
+
+    const {id} = useParams();
+
+    const handleGetSeconds = () => {
+        const challengeCreationTime = new Date(challenge?.creationTime);
+        const currentTime = new Date();
+
+        const endTimeToSeconds =
+            (challengeCreationTime.getMinutes() + 19) * 60 +
+            challengeCreationTime.getSeconds();
+        const currentTimeToSeconds =
+            currentTime.getMinutes() * 60 + currentTime.getSeconds();
+
+        const restantTimeInSeconds = endTimeToSeconds - currentTimeToSeconds;
+
+        if (restantTimeInSeconds <= 0) navigate("/completed/" + id);
+
+        setSeconds(restantTimeInSeconds);
+    };
+
     useEffect(() => {
-        if (seconds < 0) return;
+        const handleBackToPage = () => {
+            handleGetSeconds();
+        };
+
+        window.addEventListener("focus", handleBackToPage);
+
+        return () => {
+            window.removeEventListener("focus", handleBackToPage);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (isNaN(seconds) && challenge !== null) handleGetSeconds();
+    }, [seconds, challenge]);
+
+    useEffect(() => {
+        if (seconds < 0 && !isNaN(seconds)) navigate("/completed/" + id);
+
         const idTimeout = setTimeout(() => {
             setSeconds(seconds - 1);
             setMinutes(Math.floor(seconds / 60));

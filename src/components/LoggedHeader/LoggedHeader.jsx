@@ -3,6 +3,11 @@ import {useLocation} from "react-router-dom";
 import {MyContext} from "../../context/AppContext";
 import {LoggedHeaderDropdown} from "../LoggedHeaderDropdown/LoggedHeaderDropdown";
 
+const routes = {
+    dashboard: "Dashboard",
+    groupchallenges: "Group Challenges",
+};
+
 export const LoggedHeader = () => {
     const [showDropdown, setShowDropdown] = useState(false);
     const {toggleSideBar, isSideBarActive} = useContext(MyContext);
@@ -61,8 +66,19 @@ export const LoggedHeader = () => {
                                 <path d="M3 12l2 0" />
                                 <path d="M19 12l2 0" />
                             </svg>
-                            <span className="mt-1 capitalize">
-                                {location.pathname.replace("/", "")}
+                            <span className="mt-1">
+                                {
+                                    routes[
+                                        Object.keys(routes).find(
+                                            (routeKey) =>
+                                                routeKey ===
+                                                location.pathname.replace(
+                                                    "/",
+                                                    ""
+                                                )
+                                        )
+                                    ]
+                                }
                             </span>
                         </div>
                         <button

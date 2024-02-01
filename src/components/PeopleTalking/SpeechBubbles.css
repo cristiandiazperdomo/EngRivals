@@ -1,0 +1,140 @@
+/* (A) SPEECH BOX */
+.speech {
+    /* (A1) FONT & COLORS */
+    font-size: 1.2em;
+    color: #fff;
+    background: #a53d38;
+
+    /* (A2) DIMENSIONS */
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 600px;
+}
+
+/* (B) USE ::AFTER TO CREATE THE "CALLOUT" */
+.speech::after {
+    display: block;
+    width: 0;
+    content: "";
+    border: 15px solid transparent;
+}
+
+/* (C) "CALLOUT" DIRECTIONS */
+.speech.up::after {
+    border-bottom-color: #a53d38;
+    border-top: 0;
+}
+
+.speech.down::after {
+    border-top-color: #a53d38;
+    border-bottom: 0;
+}
+
+.speech.left::after {
+    border-right-color: #a53d38;
+    border-left: 0;
+}
+
+.speech.right::after {
+    border-left-color: #a53d38;
+    border-right: 0;
+}
+
+/* (D) POSITION THE CALLOUT */
+.speech {
+    position: relative;
+    height: 100%;
+}
+
+.speech::after {
+    position: absolute;
+}
+
+.speech.up::after {
+    top: -15px;
+    left: calc(50% - 15px);
+}
+
+.speech.down::after {
+    bottom: -15px;
+    left: calc(50% - 15px);
+}
+
+.speech.left::after {
+    left: -15px;
+    top: 24px;
+}
+
+.speech.right::after {
+    right: -15px;
+    top: calc(50% - 15px);
+}
+
+
+.loadership_TIVIK {
+    display: flex;
+    position: relative;
+    width: 46px;
+    height: 60px;
+}
+
+.loadership_TIVIK div {
+    position: absolute;
+    width: 6px;
+    height: 8px;
+    background: #ffffff;
+    top: 20px;
+    animation: loadership_TIVIK_scale 1.8s infinite, loadership_TIVIK_fade 1.8s infinite;
+    animation-timing-function: ease-in-out;
+}
+
+.loadership_TIVIK div:nth-child(1) {
+    animation-delay: 0.00s;
+    left: 0px;
+}
+
+.loadership_TIVIK div:nth-child(2) {
+    animation-delay: 0.16s;
+    left: 10px;
+}
+
+.loadership_TIVIK div:nth-child(3) {
+    animation-delay: 0.32s;
+    left: 20px;
+}
+
+.loadership_TIVIK div:nth-child(4) {
+    animation-delay: 0.48s;
+    left: 30px;
+}
+
+.loadership_TIVIK div:nth-child(5) {
+    animation-delay: 0.64s;
+    left: 40px;
+}
+
+@keyframes loadership_TIVIK_scale {
+
+    0%,
+    44.44444444444445%,
+    100% {
+        transform: scaleY(1);
+    }
+
+    22.222222222222225% {
+        transform: scaleY(3);
+    }
+}
+
+@keyframes loadership_TIVIK_fade {
+
+    0%,
+    44.44444444444445%,
+    100% {
+        opacity: 1;
+    }
+
+    22.222222222222225% {
+        opacity: 1;
+    }
+}

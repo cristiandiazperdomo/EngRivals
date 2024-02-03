@@ -28,14 +28,12 @@ export const SpeechBubble = ({title, position, hidden, response}) => {
                 clearInterval(idInterval);
             }
             setSeconds(seconds + 1);
-        }, 500);
+        }, 1000);
 
         return () => {
             clearInterval(idInterval);
         };
     }, [seconds, isAudioOn]);
-
-    console.log(seconds, synth.speaking);
 
     return (
         <div className={`speech ${position}`}>

@@ -7,7 +7,7 @@ export const createChallenge = (navigate) => {
                 );
 
             const response = await fetch(
-                "http://localhost:8080/v1/api/challenges/1/2",
+                "http://localhost:8080/v1/api/challenges/3/6",
                 {
                     method: "POST",
                     headers: {

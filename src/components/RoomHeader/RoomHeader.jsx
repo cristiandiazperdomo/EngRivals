@@ -1,9 +1,7 @@
 import {useEffect, useState} from "react";
 import {RoomBarProgress} from "../RoomBarProgress/RoomBarProgress";
 
-export const RoomHeader = () => {
-    const [stars, setStars] = useState(999);
-
+export const RoomHeader = ({points}) => {
     return (
         <header className="w-full md:w-[800px] lg:w-[1000px] xl:w-[1200px] mx-auto">
             <div className="flex justify-center items-center mx-4 lg:mx-0 lg: mt-8 mb-4 md:mt-16 md:mb-16">
@@ -24,7 +22,7 @@ export const RoomHeader = () => {
                     <path d="M6 6l12 12" />
                 </svg>
                 <RoomBarProgress />
-                <div className="flex hidden sm:flex">
+                <div className="flex hidden sm:flex animate-bounce">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className="icon icon-tabler icon-tabler-stars-filled text-yellow-600"
@@ -54,7 +52,9 @@ export const RoomHeader = () => {
                             fill="currentColor"
                         />
                     </svg>
-                    <span className="font-bold text-3xl ml-2">{stars}</span>
+                    <span className="font-bold text-3xl ml-2 text-yellow-600">
+                        {points}
+                    </span>
                 </div>
             </div>
         </header>

@@ -59,7 +59,7 @@ export const Timer = () => {
     }, [seconds]);
 
     return (
-        <div className="flex fixed sm:relative top-0 left-0 mt-2 pl-4 font-bold sm:font-normal">
+        <div className="flex fixed sm:relative top-0 left-0 mt-2 pl-4 sm:pl-0 font-bold sm:font-normal">
             <div className="flex space-x-2 text-gray-600 items-center">
                 <svg
                     xmlns="http://www.w3.org/2000/svg"

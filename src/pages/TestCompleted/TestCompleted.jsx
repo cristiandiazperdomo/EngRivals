@@ -5,16 +5,54 @@ import {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {getChallenge} from "../../redux/actions/challengeActions";
 
+import * as Tooltip from "@radix-ui/react-tooltip";
+
 const wordsList = ["wasting", "play", "clean", "teacher", "loyalty"];
+
+import win from "../../assets/fanfare-trumpets.mp3";
+import lose from "../../assets/happy-beeps.wav";
 
 export const TestCompleted = () => {
     const [wellAnsweredQuestions, setWellAnsweredQuestions] =
         useState(undefined);
+    const [wellUsedWords, setWellUsedWords] = useState([]);
 
     const {id} = useParams();
 
     const dispatch = useDispatch();
     const {challenge} = useSelector((state) => state.challengeReducer);
+
+    const foundWellUsedWords = () => {
+        const wellUsed = [];
+        for (let i = 0; i < challenge?.questions?.length; i++) {
+            const question = challenge.questions[i];
+
+            const wellAnswered = question.answers.find(
+                (answer) => answer.userId === "1"
+            );
+
+            if (wellAnswered.isCorrect === true) {
+                const randomNumber = Math.floor(
+                    Math.random() * (question.title.split(" ").length - 0 + 1) +
+                        0
+                );
+
+                const selectedWord = question.title.split(" ")[randomNumber];
+
+                const isItUseful = selectedWord === undefined 
+                || selectedWord?.length === 0
+                || wellUsed.some(word => word === selectedWord);
+
+                if (isItUseful)
+                    continue;
+
+                if (wellUsed?.length < 6) {
+                    wellUsed.push(selectedWord?.replaceAll("?", ""));
+                }
+            }
+        }
+        setWellUsedWords(wellUsed);
+    };
 
     const getWellAnsweredQuestions = () => {
         let correctAnswersCounter = 0;
@@ -23,7 +61,7 @@ export const TestCompleted = () => {
             const loggedUserId = "1";
             const userLoggedAnswer = question.answers.find(
                 (answer) => answer.userId === loggedUserId
-            );
+            )?.isCorrect;
             if (userLoggedAnswer) correctAnswersCounter++;
         });
 
@@ -39,8 +77,9 @@ export const TestCompleted = () => {
     useEffect(() => {
         if (challenge !== null && !(challenge instanceof Promise)) {
             getWellAnsweredQuestions();
+            foundWellUsedWords();
         }
-    }, [challenge]);
+    }, [challenge, id]);
 
     return (
         <div className="w-full flex min-h-screen items-center justify-center">
@@ -69,7 +108,7 @@ export const TestCompleted = () => {
                             Completed
                         </Badge>
                         <h2 className="text-2xl font-bold my-4 text-center">
-                            A1: SMALL TALK
+                            {challenge?.title}
                         </h2>
                         <div className="grid grid-cols-2 mb-2 justify-left">
                             <div className="flex flex-col items-center">
@@ -173,31 +212,86 @@ export const TestCompleted = () => {
                         </div>
                         <div>
                             <ul className="my-4 space-y-2">
-                                {wordsList.map((word) => (
-                                    <li className="flex justify-between w-full border rounded-xl p-1.5">
-                                        <div className="flex text-lg">
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                className="icon icon-tabler icon-tabler-circle-check-filled text-green-500 w-8 mr-4"
-                                                viewBox="0 0 24 24"
-                                                strokeWidth="2"
-                                                stroke="currentColor"
-                                                fill="none"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                            >
-                                                <path
-                                                    stroke="none"
-                                                    d="M0 0h24v24H0z"
+                                {wellUsedWords?.map((word, index) => (
+                                    <li
+                                        className="flex justify-between w-full border rounded-xl p-1.5"
+                                        key={index}
+                                    >
+                                        <div className="flex text-lg justify-between w-full">
+                                            <div className="flex">
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    className="icon icon-tabler icon-tabler-circle-check-filled text-green-500 w-8 mr-4"
+                                                    viewBox="0 0 24 24"
+                                                    strokeWidth="2"
+                                                    stroke="currentColor"
                                                     fill="none"
-                                                />
-                                                <path
-                                                    d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-1.293 5.953a1 1 0 0 0 -1.32 -.083l-.094 .083l-3.293 3.292l-1.293 -1.292l-.094 -.083a1 1 0 0 0 -1.403 1.403l.083 .094l2 2l.094 .083a1 1 0 0 0 1.226 0l.094 -.083l4 -4l.083 -.094a1 1 0 0 0 -.083 -1.32z"
-                                                    strokeWidth="0"
-                                                    fill="currentColor"
-                                                />
-                                            </svg>
-                                            {word}
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                >
+                                                    <path
+                                                        stroke="none"
+                                                        d="M0 0h24v24H0z"
+                                                        fill="none"
+                                                    />
+                                                    <path
+                                                        d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-1.293 5.953a1 1 0 0 0 -1.32 -.083l-.094 .083l-3.293 3.292l-1.293 -1.292l-.094 -.083a1 1 0 0 0 -1.403 1.403l.083 .094l2 2l.094 .083a1 1 0 0 0 1.226 0l.094 -.083l4 -4l.083 -.094a1 1 0 0 0 -.083 -1.32z"
+                                                        strokeWidth="0"
+                                                        fill="currentColor"
+                                                    />
+                                                </svg>
+                                                {word}
+                                            </div>
+                                            <Tooltip.Provider>
+                                                <Tooltip.Root>
+                                                    <Tooltip.Trigger asChild>
+                                                        <Link
+                                                            to={
+                                                                "https://dictionary.cambridge.org/es/diccionario/ingles-espanol/" +
+                                                                word
+                                                            }
+                                                            target="_blank"
+                                                        >
+                                                            <svg
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                className="icon icon-tabler icon-tabler-external-link transition-all duration-150 text-gray-300 hover:text-gray-600 cursor-pointer"
+                                                                width="24"
+                                                                height="24"
+                                                                viewBox="0 0 24 24"
+                                                                strokeWidth="2"
+                                                                stroke="currentColor"
+                                                                fill="none"
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                            >
+                                                                <path
+                                                                    stroke="none"
+                                                                    d="M0 0h24v24H0z"
+                                                                    fill="none"
+                                                                />
+                                                                <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6" />
+                                                                <path d="M11 13l9 -9" />
+                                                                <path d="M15 4h5v5" />
+                                                            </svg>
+                                                        </Link>
+                                                    </Tooltip.Trigger>
+                                                    <Tooltip.Portal>
+                                                        <Tooltip.Content
+                                                            className="data-[state=delayed-open]:data-[side=top]:animate-slideDownAndFade data-[state=delayed-open]:data-[side=right]:animate-slideLeftAndFade data-[state=delayed-open]:data-[side=left]:animate-slideRightAndFade data-[state=delayed-open]:data-[side=bottom]:animate-slideUpAndFade text-violet11 select-none rounded-[4px] bg-white px-[15px] py-[10px] text-[15px] leading-none shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] will-change-[transform,opacity]"
+                                                            sideOffset={5}
+                                                        >
+                                                            <span className="text-xs text-gray-500">
+                                                                See more info in{" "}
+                                                            </span>
+                                                            <span className="font-bold text-xs text-gray-600">
+                                                                Cambridge
+                                                                Dictionary
+                                                            </span>
+                                                            <Tooltip.Arrow className="fill-white" />
+                                                        </Tooltip.Content>
+                                                    </Tooltip.Portal>
+                                                </Tooltip.Root>
+                                            </Tooltip.Provider>
                                         </div>
                                     </li>
                                 ))}
@@ -205,7 +299,13 @@ export const TestCompleted = () => {
                         </div>
                         <div className="text-green-500 text-2xl justify-center flex space-x-2">
                             <p>+</p>
-                            <p>4</p>
+                            <p>
+                                {
+                                    challenge?.points?.find(
+                                        (point) => point.userId === "2"
+                                    ).points
+                                }
+                            </p>
                             <p>XP</p>
                         </div>
                         <Link to="/groupchallenges">
@@ -219,8 +319,17 @@ export const TestCompleted = () => {
                         </Link>
                         <div className="grid grid-cols-1 w-full">
                             {[
-                                {score: 5, criterion: "Answered Correctly"},
-                                {score: 50, criterion: "Accuracy"},
+                                {
+                                    score: wellAnsweredQuestions,
+                                    criterion: "Answered Correctly",
+                                },
+                                {
+                                    score: Math.floor(
+                                        (wellAnsweredQuestions * 100) /
+                                            challenge?.questions?.length
+                                    ),
+                                    criterion: "Accuracy",
+                                },
                             ].map((criteria) => (
                                 <div className="bg-gray-50 rounded-b-xl p-4 text-center border-b-2 first:rounded-t-xl first:rounded-b-none last:mt-4">
                                     <p className="text-green-700 text-2xl font-black">

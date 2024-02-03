@@ -12,10 +12,17 @@ import {useDispatch, useSelector} from "react-redux";
 import {useNavigate, useParams} from "react-router-dom";
 import {OpenQuestion} from "../../components/Challenges/OpenQuestion";
 
+import mistake from "../../assets/germanio_trumpet-e4.wav";
+import right from "../../assets/powerupsuccess.wav";
+
+import suspense from "../../assets/orchestra-end-game.mp3";
+
 export const Rooms = () => {
     const [currentQuestion, setCurrentQuestion] = useState(null);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(undefined);
     const [showResult, setShowResult] = useState(false);
+
+    const [showDelete, setShowDelete] = useState(false);
 
     const optionsList = useRef();
     const userPhraseRef = useRef();
@@ -59,6 +66,10 @@ export const Rooms = () => {
             areThereMoreQuestions();
 
         if (!areThere) {
+            const audio = new Audio(suspense);
+            audio.preload = "auto";
+            audio.volume = 0.9;
+            audio.play();
             navigate("/completed/" + id);
             return;
         }
@@ -77,10 +88,6 @@ export const Rooms = () => {
 
         setCurrentQuestion(
             challenge.questions[indexesOfNotAnsweredsQuestions[getRandomNumber]]
-        );
-
-        setCurrentQuestionIndex(
-            indexesOfNotAnsweredsQuestions[getRandomNumber]
         );
     };
 
@@ -104,10 +111,6 @@ export const Rooms = () => {
 
         setCurrentQuestion(
             challenge.questions[indexesOfNotAnsweredsQuestions[getRandomNumber]]
-        );
-
-        setCurrentQuestionIndex(
-            indexesOfNotAnsweredsQuestions[getRandomNumber]
         );
     };
 
@@ -213,10 +216,30 @@ export const Rooms = () => {
     };
 
     useEffect(() => {
+        window.speechSynthesis.cancel();
+        console.log(window.speechSynthesis.speaking, "is this shit speaking");
+    }, [currentQuestion]);
+
+    useEffect(() => {
         if (challenge === null) {
             dispatch(getChallenge(id));
         }
     }, []);
+
+    useEffect(() => {
+        if (!currentQuestion?.answers?.find((answer) => answer.userId === "1"))
+            return;
+        let audio = new Audio(mistake);
+        if (
+            currentQuestion?.answers?.find((answer) => answer.userId === "1")
+                ?.isCorrect
+        ) {
+            audio = new Audio(right);
+        }
+        audio.preload = "auto";
+        audio.volume = 0.9;
+        audio.play();
+    }, [showResult]);
 
     useEffect(() => {
         if (challenge !== null && !(challenge instanceof Promise)) {
@@ -265,15 +288,62 @@ export const Rooms = () => {
         }
     }, [challenge]);
 
+    const handleEditDeleteQuestion = async () => {
+        try {
+            const response = await fetch(
+                "http://localhost:8080/v1/api/questionsN",
+                {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(currentQuestion),
+                }
+            );
+
+            const data = await response.json();
+
+            alert(data.status);
+            setShowDelete(false);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     return (
         <div className="flex flex-col justify-between min-h-screen">
             <div className="hidden for now">
                 <UserStatusDropdown />
             </div>
             <div className="hidden sm:flex">
-                <RoomHeader />
+                <RoomHeader
+                    points={
+                        challenge?.points?.find((point) => point.userId === "2")
+                            ?.points
+                    }
+                />
             </div>
-            <div className="mx-auto max-w-[540px] w-full">
+            {showDelete && (
+                <div
+                    className="p-12 bg-red-100 mx-auto w-100"
+                    style={{zIndex: 2000}}
+                >
+                    <button
+                        className="bg-black text-white p-2 rounded-xl"
+                        onClick={handleEditDeleteQuestion}
+                    >
+                        ELIMINAR PREGUNTA
+                    </button>
+                </div>
+            )}
+            <button
+                className="bg-red-600 text-white p-2 rounded-xl w-100 mx-auto cursor-pointer absolute right-20 top-20"
+                style={{zIndex: 1000}}
+                onClick={() => setShowDelete(!showDelete)}
+            >
+                ABRIR ELIMINAR
+            </button>
+            <div className="sm:mx-auto w-full sm:w-[540px]">
                 <div className="flex flex-col justify-between items-center mx-4 sm:mx-0">
                     {currentQuestion?.typeOfExercise === "translation" && (
                         <Translate
@@ -301,11 +371,9 @@ export const Rooms = () => {
                 </div>
             </div>
             <RoomFooter
-                isRight={
-                    currentQuestion?.answers?.find(
-                        (answer) => answer.userId === "1"
-                    )?.isCorrect
-                }
+                answer={currentQuestion?.answers?.find(
+                    (answer) => answer.userId === "1"
+                )}
                 showResult={showResult}
                 submit={handleSaveAnswer}
                 next={handleGetNextQuestion}

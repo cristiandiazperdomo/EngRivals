@@ -2,10 +2,10 @@ import {Link} from "react-router-dom";
 
 export const Brand = () => {
     return (
-        <Link className="flex space-x-2 items-center">
+        <Link className="flex space-x-0 sm:space-x-2 items-center">
             <img
-                src="https://i.imgur.com/QiZzgWO.png"
-                width="48"
+                src="https://i.imgur.com/MGd78zy.png"
+                width="52"
                 className="-mr-2"
             ></img>
             <div className="font-semibold text-xl">

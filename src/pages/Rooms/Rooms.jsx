@@ -159,9 +159,9 @@ export const Rooms = () => {
 
         if (userPhraseRef.current?.childNodes?.length === 0) return null;
 
-        userPhraseRef.current.childNodes.forEach(
-            (word) => (completeAnswer += " " + word.textContent)
-        );
+        userPhraseRef.current
+            .querySelectorAll("span")
+            .forEach((word) => (completeAnswer += " " + word.textContent));
 
         const questionWithAnswer = structuredClone(currentQuestion);
 
@@ -311,7 +311,7 @@ export const Rooms = () => {
     };
 
     return (
-        <div className="flex flex-col justify-between min-h-screen">
+        <div className="flex flex-col justify-between h-screen">
             <div className="hidden for now">
                 <UserStatusDropdown />
             </div>
@@ -344,7 +344,7 @@ export const Rooms = () => {
                 ABRIR ELIMINAR
             </button>
             <div className="sm:mx-auto w-full sm:w-[540px]">
-                <div className="flex flex-col justify-between items-center mx-4 sm:mx-0">
+                <div className="flex flex-col justify-between items-center px-4 sm:mx-0">
                     {currentQuestion?.typeOfExercise === "translation" && (
                         <Translate
                             currentQuestion={currentQuestion}

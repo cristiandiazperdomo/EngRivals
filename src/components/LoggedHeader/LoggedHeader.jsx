@@ -15,13 +15,13 @@ export const LoggedHeader = () => {
     const location = useLocation();
 
     return (
-        <header className={`bg-gray-50`}>
+        <header className="bg-gray-50">
             <div
                 className={`transition-all duration-500 ${
                     isSideBarActive ? "ml-0 sm:ml-64" : "container mx-auto"
                 }`}
             >
-                <div className="mx-8">
+                <div className="mx-8 sm:mr-12">
                     <div className="flex justify-between items-center py-8">
                         <div className="flex text-md font-bold text-gray-500">
                             <svg
@@ -82,7 +82,7 @@ export const LoggedHeader = () => {
                             </span>
                         </div>
                         <button
-                            className="relative flex items-center text-gray-500 text-3xl group"
+                            className="relative flex items-center text-gray-500 text-3xl group ml-2 sm:ml-0"
                             onClick={() => setShowDropdown(!showDropdown)}
                         >
                             <svg

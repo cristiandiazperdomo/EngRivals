@@ -5,9 +5,8 @@ export const LoggedHeaderDropdown = ({showDropdown}) => {
         <div
             id="dropdownInformation"
             className={`absolute top-12 transition-all duration-50 ${
-                showDropdown ? "opacity-100" : "opacity-0"
+                showDropdown ? "opacity-100 z-50" : "opacity-0 -z-20"
             } right-0 text-left bg-white divide-y divide-gray-100 rounded-lg shadow w-52 dark:bg-gray-700 dark:divide-gray-600`}
-            style={{zIndex: "200"}}
         >
             <div className="px-4 py-3 text-sm text-gray-900 dark:text-white">
                 <div>Bonnie Green</div>

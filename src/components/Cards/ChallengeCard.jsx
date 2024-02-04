@@ -1,10 +1,12 @@
 export const ChallengeCard = ({category, videoUrl, handleCreateLobby}) => {
     return (
         <div
-            className="relative w-[calc(100%-16px)] md:w-[calc(50%-16px)] xl:w-[calc(25%-16px)] rounded-xl group cursor-pointer"
+            className="relative w-[calc(100%)] sm:w-[calc(100%-16px)] md:w-[calc(50%-16px)] xl:w-[calc(25%-16px)] xl:w-[calc(25%-16px)] rounded-xl group cursor-pointer"
             onClick={handleCreateLobby}
         >
             <video
+                poster="asd"
+                preload="auto"
                 className="relative rounded-xl z-0 h-full"
                 autoPlay
                 muted

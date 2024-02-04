@@ -12,12 +12,12 @@ export function Home() {
     return (
         <>
             <div className="container mx-auto">
-                <button
+                {/* <button
                     className="bg-black p-6 text-white rounded-xl"
                     onClick={callOpenAiApi}
                 >
                     Create questions
-                </button>
+                </button> */}
                 <div className="mx-4">
                     <Header />
                     <HeroSection />

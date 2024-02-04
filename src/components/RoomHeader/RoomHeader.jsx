@@ -22,7 +22,7 @@ export const RoomHeader = ({points}) => {
                     <path d="M6 6l12 12" />
                 </svg>
                 <RoomBarProgress />
-                <div className="flex hidden sm:flex animate-bounce">
+                <div className="flex hidden sm:flex">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className="icon icon-tabler icon-tabler-stars-filled text-yellow-600"

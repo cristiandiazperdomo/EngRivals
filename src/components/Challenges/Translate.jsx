@@ -33,7 +33,7 @@ export const Translate = ({currentQuestion, optionsList, title, options}) => {
     };
 
     return (
-        <div className="flex flex-col justify-between mt-12 sm:-mt-20 md:-mt-44 ">
+        <div className="w-full sm:w-[540px] flex flex-col justify-between mt-12 sm:-mt-20 md:-mt-44 ">
             <div className="flex flex-col items-center">
                 <div className="flex justify-center items-center text-center">
                     <div className="w-full sm:w-[540px]">

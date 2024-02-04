@@ -3,9 +3,9 @@ import {Button, Badge} from "@radix-ui/themes";
 
 export const HeroSection = () => {
     return (
-        <div className="flex min-h-[600px] max-h-[600px] mt-12">
+        <div className="flex min-h-[600px] max-h-[600px] mt-0 sm:mt-2">
             <div className="flex items-center w-full">
-                <div className="flex flex-col items-start">
+                <div className="flex flex-col items-start w-full">
                     <Badge
                         className="font-normal"
                         color="red"
@@ -15,7 +15,7 @@ export const HeroSection = () => {
                         Start today it will always be free
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            class="icon icon-tabler icon-tabler-arrow-right"
+                            className="icon icon-tabler icon-tabler-arrow-right"
                             width="16"
                             height="16"
                             viewBox="0 0 24 24"
@@ -33,7 +33,7 @@ export const HeroSection = () => {
                     </Badge>
                     <div className="text-left w-full">
                         <div className="my-10">
-                            <h2 className="text-left text-5xl sm:text-6xl font-bold">
+                            <h2 className="text-left text-4xl sm:text-6xl font-bold">
                                 <span className="text-red-500 block">
                                     Compete with others
                                 </span>{" "}

@@ -1,6 +1,13 @@
 import {useEffect, useState} from "react";
 import {Word} from "./Word";
 import {PhraseCard} from "../Cards/PhraseCard";
+import {DndContext, closestCenter} from "@dnd-kit/core";
+import {
+    SortableContext,
+    arrayMove,
+    horizontalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import {UserPhrase} from "./UserPhrase";
 
 export const CompletePhrase = ({title, phrase, userPhraseRef}) => {
     const [originalPhrase, setOriginalPhrase] = useState(undefined);
@@ -19,8 +26,14 @@ export const CompletePhrase = ({title, phrase, userPhraseRef}) => {
     };
 
     const handleRemoveFromUserPhrase = (position) => {
+        const updatedUserPhrase = [...userPhrase].filter(
+            (word, index) => index !== position
+        );
+
+        userPhrase.forEach((word, index) => console.log(word, index + 1));
+
         setUserPhrase(
-            [...userPhrase].filter((word, index) => index !== position)
+            updatedUserPhrase.map((word, index) => ({...word, id: index + 1}))
         );
     };
 
@@ -30,8 +43,17 @@ export const CompletePhrase = ({title, phrase, userPhraseRef}) => {
     useEffect(() => {
         setOriginalPhrase(shuffleArray(separateWords(phrase)));
         setUserPhrase([]);
-        console.log("buenas tardes");
     }, [phrase]);
+
+    const handleDragEnd = (event) => {
+        const {active, over} = event;
+
+        const oldIndex = userPhrase.findIndex((word) => word.id === active.id);
+        const newIndex = userPhrase.findIndex((word) => word.id === over.id);
+
+        setUserPhrase(arrayMove(userPhrase, oldIndex, newIndex));
+    };
+
     return (
         <div className="flex flex-col w-full items-center justify-center">
             <PhraseCard title={title} instruction="Complete these phrase" />
@@ -40,15 +62,35 @@ export const CompletePhrase = ({title, phrase, userPhraseRef}) => {
                     className="flex flex-wrap gap-2 min-h-[124px] border-b-2 pb-2"
                     ref={userPhraseRef}
                 >
-                    {userPhrase?.map((word, index) => (
+                    {/*userPhrase?.map((word, index) => (
                         <span
                             key={index}
                             className="bg-transparent p-2 sm:p-3 border rounded-full w-100 max-h-12 border-2 cursor-pointer"
-                            onClick={() => handleRemoveFromUserPhrase(index)}
+                            onClick={() =>
+                                handleRemoveFromUserPhrase(index)
+                            }
                         >
                             {word.word}
                         </span>
-                    ))}
+                        ))*/}
+                    <DndContext
+                        collisionDetection={closestCenter}
+                        onDragEnd={handleDragEnd}
+                    >
+                        <SortableContext
+                            items={userPhrase}
+                            strategy={horizontalListSortingStrategy}
+                        >
+                            {userPhrase?.map((word, index) => (
+                                <UserPhrase
+                                    key={index}
+                                    remove={handleRemoveFromUserPhrase}
+                                    word={word}
+                                    position={index}
+                                />
+                            ))}
+                        </SortableContext>
+                    </DndContext>
                 </div>
                 <div className="flex flex-wrap gap-2 justify-center">
                     {originalPhrase?.map((word, index) => (

@@ -14,7 +14,11 @@ export const Word = ({
 
     const handleClick = () => {
         if (handleIsWordUsed()) return;
-        handleAddToUserPhrase({indexOriginalPhrase, word});
+        handleAddToUserPhrase({
+            indexOriginalPhrase,
+            word,
+            id: userPhrase.length === 0 ? 1 : userPhrase.length + 1,
+        });
     };
 
     return (

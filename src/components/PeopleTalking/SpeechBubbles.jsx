@@ -11,6 +11,8 @@ export const SpeechBubble = ({title, position, hidden, response}) => {
 
         const utterThis = new SpeechSynthesisUtterance(response);
 
+        utterThis.rate = 0.9;
+
         const voices = synth.getVoices();
 
         utterThis.voice = voices[1];
@@ -64,7 +66,7 @@ export const SpeechBubble = ({title, position, hidden, response}) => {
                             <path d="M6 15h-2a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1h2l3.5 -4.5a.8 .8 0 0 1 1.5 .5v14a.8 .8 0 0 1 -1.5 .5l-3.5 -4.5" />
                         </svg>
                     )}
-                    <span className="mt-2 ml-2">___________</span>
+                    <span className="mt-2 ml-2">_______</span>
                 </span>
             ) : (
                 title

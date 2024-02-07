@@ -165,6 +165,8 @@ export const Rooms = () => {
 
         const questionWithAnswer = structuredClone(currentQuestion);
 
+        console.log(completeAnswer, "complete answer");
+
         questionWithAnswer.answers = [
             {
                 answer: completeAnswer.slice(1, completeAnswer.length),
@@ -202,7 +204,7 @@ export const Rooms = () => {
     const handleSaveAnswer = () => {
         let questionWithAnswer = null;
 
-        if (currentQuestion.typeOfExercise === "translation") {
+        if (currentQuestion?.typeOfExercise === "translation") {
             questionWithAnswer = handleGetTranslationAnswer();
         } else if (currentQuestion.typeOfExercise === "open question") {
             questionWithAnswer = handleGetOpenQuestionAnswer();
@@ -345,7 +347,9 @@ export const Rooms = () => {
             </button>
             <div className="sm:mx-auto w-full sm:w-[540px]">
                 <div className="flex flex-col justify-between items-center px-4 sm:mx-0">
-                    {currentQuestion?.typeOfExercise === "translation" && (
+                    {["translation", "multiple choice"].includes(
+                        currentQuestion?.typeOfExercise
+                    ) && (
                         <Translate
                             currentQuestion={currentQuestion}
                             title={currentQuestion?.title}

@@ -1,26 +1,18 @@
-export const ChallengeCard = ({category, videoUrl, handleCreateLobby}) => {
+export const ChallengeCard = ({category, image, txt, handleCreateLobby}) => {
     return (
         <div
-            className="relative w-[calc(100%)] sm:w-[calc(100%-16px)] md:w-[calc(50%-16px)] xl:w-[calc(25%-16px)] xl:w-[calc(25%-16px)] rounded-xl group cursor-pointer"
+            className="transition-all duration-150 flex justify-end items-center border border-gray-500 relative w-[calc(100%)] sm:w-[calc(100%-16px)] md:w-[calc(50%-16px)] xl:w-[calc(25%-16px)] xl:w-[calc(25%-16px)] h-[210px] rounded-xl group cursor-pointer hover:shadow-lg hover:shadow-red-200"
             onClick={handleCreateLobby}
         >
-            <video
-                poster="asd"
-                preload="auto"
-                className="relative rounded-xl z-0 h-full"
-                autoPlay
-                muted
-                loop
-                src={videoUrl}
-            ></video>
+            <img src={image} alt={txt} className="h-[160px] mr-4" />
             <div className="top-0 absolute w-full h-full flex">
                 <div className="relative w-full h-full">
                     <div className="absolute">
-                        <p className="text-white font-bold text-2xl mt-4 ml-4 z-10">
+                        <p className="text-black font-bold text-2xl mt-4 ml-4 z-10">
                             {category}
                         </p>
                     </div>
-                    <div className="transition-all duration-500 opacity-0 group-hover:opacity-100 flex flex-col justify-center items-center w-full h-full bg-gradient-to-b from-transparent to-red-800 bg-opacity-10 z-10 rounded-xl text-white">
+                    <div className="transition-all duration-500 text-black opacity-0 group-hover:opacity-100 flex flex-col justify-center items-center w-full h-full bg-gradient-to-b from-transparent to-red-200 z-10 rounded-xl">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="icon icon-tabler icon-tabler-users"

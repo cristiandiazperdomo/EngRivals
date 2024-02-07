@@ -13,7 +13,7 @@ export const PeopleTalking = ({instruction, title, response}) => {
             <div className="flex flex-col items-start w-full rounded-xl p-4 sm:py-12 space-y-4">
                 <div className="flex space-x-6  w-full">
                     <img
-                        src={famaleAvatar}
+                        src={menAvatar}
                         alt="famale-avatar"
                         className="w-20 h-20"
                     />
@@ -31,7 +31,7 @@ export const PeopleTalking = ({instruction, title, response}) => {
                         response={response}
                     />
                     <img
-                        src={menAvatar}
+                        src={famaleAvatar}
                         alt="men-avatar"
                         className="w-20 h-20"
                     />

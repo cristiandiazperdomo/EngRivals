@@ -13,9 +13,7 @@ export const CompletePhrase = ({title, phrase, userPhraseRef}) => {
     const [originalPhrase, setOriginalPhrase] = useState(undefined);
     const [userPhrase, setUserPhrase] = useState([]);
 
-    const separateWords = (phrase) => {
-        return phrase.split(" ");
-    };
+    const separateWords = (phrase) => phrase.split(" ");
 
     const shuffleArray = (array) => {
         for (let i = array.length - 1; i > 0; i--) {

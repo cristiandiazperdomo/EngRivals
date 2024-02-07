@@ -4,7 +4,7 @@ import {RoomBarProgress} from "../RoomBarProgress/RoomBarProgress";
 export const RoomHeader = ({points}) => {
     return (
         <header className="w-full md:w-[800px] lg:w-[1000px] xl:w-[1200px] mx-auto">
-            <div className="flex justify-center items-center mx-4 lg:mx-0 lg: mt-8 mb-4 md:mt-16 md:mb-16">
+            <div className="flex justify-center items-center mx-4 lg:mx-0 lg: mt-8 mb-4 md:mt-12 md:mb-12">
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="icon icon-tabler icon-tabler-x text-gray-400 cursor-pointer hidden sm:flex"

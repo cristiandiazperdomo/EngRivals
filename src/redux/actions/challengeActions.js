@@ -1,13 +1,15 @@
-export const createChallenge = (navigate) => {
+export const createChallenge = (navigate, categoryId) => {
     return async (dispatch) => {
         try {
             const isTheBrowserCompatibleWithAudio =
                 window.navigator.userAgentData.brands.some(
                     (brand) => brand.brand === "Brave"
-                );
+                )
+                    ? false
+                    : true;
 
             const response = await fetch(
-                "http://localhost:8080/v1/api/challenges/3/6",
+                `http://localhost:8080/v1/api/challenges/${categoryId}/1`,
                 {
                     method: "POST",
                     headers: {

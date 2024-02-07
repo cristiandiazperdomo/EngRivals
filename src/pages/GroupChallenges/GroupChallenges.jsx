@@ -9,22 +9,35 @@ import {useNavigate} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {createChallenge} from "../../redux/actions/challengeActions";
 
+import grammar from "../../assets/grammar.svg";
+import actions from "../../assets/actions.svg";
+import vocabulary from "../../assets/vocabulary.svg";
+import prepositions from "../../assets/prepositions.svg";
+
 const challengeCards = [
     {
-        category: "Small Talk",
-        videoUrl: "https://i.imgur.com/os2iEWc.mp4",
+        category: "Grammar",
+        image: grammar,
+        txt: "Grammar",
+        categoryId: 1,
     },
     {
-        category: "Work",
-        videoUrl: "https://i.imgur.com/WZ7UKpl.mp4",
+        category: "Prepositions",
+        image: prepositions,
+        txt: "Prepositions",
+        categoryId: 2,
     },
     {
-        category: "Groceries",
-        videoUrl: "https://i.imgur.com/Yq8xKOM.mp4",
+        category: "Verbs",
+        image: actions,
+        txt: "Verbs",
+        categoryId: 3,
     },
     {
-        category: "Vacations",
-        videoUrl: "https://i.imgur.com/e6B849D.mp4",
+        category: "Vocabulary",
+        image: vocabulary,
+        txt: "Vocabulary",
+        categoryId: 4,
     },
 ];
 
@@ -35,9 +48,9 @@ export const GroupChallenges = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const handleCreateLobby = () => {
+    const handleCreateLobby = (categoryId) => {
         setShowLoaderScreen(true);
-        dispatch(createChallenge(navigate));
+        dispatch(createChallenge(navigate, categoryId));
     };
 
     return (
@@ -57,7 +70,7 @@ export const GroupChallenges = () => {
                         <div className="w-full">
                             <div className="flex flex-col sm:flex-row w-full justify-between">
                                 <h2 className="text-3xl font-bold text-red-700">
-                                    Group Challenges for A1
+                                    Group Challenges for A1-A2
                                 </h2>
                                 <div className="flex flex-wrap justify-end items-center my-2 sm:my-0 sm:mr-4 w-100">
                                     <div className="flex text-2xl">
@@ -135,16 +148,19 @@ export const GroupChallenges = () => {
                             <ChallengeCard
                                 key={challenge.category}
                                 category={challenge.category}
-                                videoUrl={challenge.videoUrl}
-                                handleCreateLobby={handleCreateLobby}
+                                image={challenge.image}
+                                txt={challenge.txt}
+                                handleCreateLobby={() =>
+                                    handleCreateLobby(challenge.categoryId)
+                                }
                             />
                         ))}
                     </div>
                     <h3 className="text-3xl font-bold text-red-700 my-12">
                         Lobbies
                     </h3>
-                    <div className="my-12">
-                        <Lobbies handleCreateLobby={handleCreateLobby} />
+                    <div className="my-12 mb-2 pr-4">
+                        <Lobbies handleCreateLobby={"handleCreateLobby"} />
                     </div>
                 </div>
             </div>

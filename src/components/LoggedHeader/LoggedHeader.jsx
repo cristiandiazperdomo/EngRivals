@@ -46,7 +46,7 @@ export const LoggedHeader = () => {
                             </svg>
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                className="icon icon-tabler icon-tabler-compass w-8 ml-4 sm:ml-8 mr-1 hover:text-gray-900 cursor-pointer transition-all duration-150"
+                                className="icon icon-tabler icon-tabler-compass w-8 ml-4 sm:ml-8 mr-1"
                                 viewBox="0 0 24 24"
                                 strokeWidth="2"
                                 stroke="currentColor"

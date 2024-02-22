@@ -67,7 +67,7 @@ export const SideBarLeft = () => {
                     </li>
                     <li>
                         <Link
-                            to="/groupchallenges"
+                            to="/grouplessons"
                             className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-red-100 hover:text-red-600 group"
                         >
                             <svg

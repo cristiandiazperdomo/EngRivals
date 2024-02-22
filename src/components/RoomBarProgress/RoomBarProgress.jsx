@@ -1,24 +1,24 @@
-import {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import {useSelector} from "react-redux";
+import {MyContext} from "../../context/AppContext";
 
 export const RoomBarProgress = () => {
     const [numberOfAnsweredQuestions, setNumberOfAnsweredQuestions] =
         useState(0);
+    const {randomNumber} = useContext(MyContext);
 
     const {challenge} = useSelector((state) => state.challengeReducer);
+    const {userInfo} = useSelector((state) => state.userReducer);
 
     useEffect(() => {
         if (challenge !== null || !(challenge instanceof Promise)) {
             let counter = 0;
 
-            const loggedUserId = "1";
-
             challenge?.questions?.forEach((question) => {
                 question.answers?.forEach((answer) => {
-                    if (answer.userId === loggedUserId) counter++;
+                    if (answer.userId === userInfo?.id) counter++;
                 });
             });
-
             setNumberOfAnsweredQuestions(counter);
         }
     }, [challenge]);

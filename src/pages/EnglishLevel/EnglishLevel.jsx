@@ -18,7 +18,6 @@ export const EnglishLevel = () => {
     const [showLevel, setShowLevel] = useState(0);
 
     const dispatch = useDispatch();
-    const {userInfo} = useSelector((state) => state.userReducer);
 
     const navigate = useNavigate();
 
@@ -31,23 +30,32 @@ export const EnglishLevel = () => {
     };
 
     const handleSetUserEnglishLevel = () => {
+        let level;
+
+        if (showLevel <= 1) {
+            level = 1;
+        } else if (showLevel <= 3) {
+            level = 2;
+        } else if (showLevel <= 5) {
+            level = 3;
+        }
+
+        if (isNaN(level)) return;
+
         const requestBody = {
-            ...userInfo,
-            level_id_level: {
-                idLevel: showLevel + 1,
-            },
+            englishLevel: level,
         };
 
         dispatch(setUserEnglishLevel(requestBody, navigate));
     };
 
     return (
-        <div className="min-h-screen min-w-full bg-gray-100 flex flex-col justify-center items-center container">
-            <div className="mb-20 text-3xl font-bold text-center mx-4">
+        <div className="min-h-screen min-w-full flex flex-col justify-center items-center container">
+            <div className="mb-6 sm:mb-20 text-2xl sm:text-3xl font-bold text-center mx-4 -mt-10">
                 <h2>Select your current english level</h2>
                 <p className="text-red-600">{levels[showLevel].level}</p>
             </div>
-            <div className="flex flex-col">
+            <div className="flex flex-col items-center">
                 <div className="flex items-center h-full space-x-0 sm:space-x-4">
                     <svg
                         onClick={handlePrevLevel}
@@ -72,7 +80,7 @@ export const EnglishLevel = () => {
                     <div className="border border-2 border-gray-200 rounded-xl flex p-1 py-12 sm:p-4 cursor-pointer w-[240px] sm:w-[460px]">
                         {levels.map((level, index) => (
                             <EnglishLevelCard
-                                key={level}
+                                key={index}
                                 level={level.level}
                                 description={level.description}
                                 showLevel={showLevel}
@@ -102,12 +110,17 @@ export const EnglishLevel = () => {
                     </svg>
                 </div>
                 <Button
-                    className="mt-12 mx-14"
+                    className={`mt-12 mx-14 text-center w-[240px] sm:w-[460px] ${
+                        showLevel >= 2 ? "h-full" : ""
+                    } py-0 sm:py-3`}
                     size="4"
                     color="red"
+                    disabled={showLevel > 1}
                     onClick={handleSetUserEnglishLevel}
                 >
-                    Continuar
+                    {showLevel > 1
+                        ? "Not available yet, but soon :) Try A1-A2 please."
+                        : "Continuar"}
                 </Button>
             </div>
         </div>

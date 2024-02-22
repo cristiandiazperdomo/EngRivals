@@ -5,7 +5,7 @@ export const EnglishLevelCard = ({level, description, showLevel, index}) => {
         <div
             className={`${
                 showLevel === index
-                    ? "transition-all duration-300 flex opacity-100 flex flex-col items-center justify-center sm:flex-row sm:items-start"
+                    ? "transition-all duration-300 flex opacity-100 flex flex-col items-center w-full justify-center sm:flex-row sm:items-start"
                     : "hidden opacity-0"
             } `}
         >

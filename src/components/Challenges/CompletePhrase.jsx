@@ -53,7 +53,7 @@ export const CompletePhrase = ({title, phrase, userPhraseRef}) => {
     };
 
     return (
-        <div className="flex flex-col w-full items-center justify-center">
+        <div className="flex flex-col w-full items-center justify-center mt-12 sm:mt-0">
             <PhraseCard title={title} instruction="Complete these phrase" />
             <div className="pb-2 sm:pb-0 w-full h-100 sm:h-[360px] space-y-14">
                 <div

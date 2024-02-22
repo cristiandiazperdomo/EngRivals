@@ -34,10 +34,10 @@ export const Translate = ({currentQuestion, optionsList, title, options}) => {
 
     return (
         <div className="w-full sm:w-[540px] flex flex-col justify-between mt-12 sm:-mt-20 md:-mt-44 ">
-            <div className="flex flex-col items-center">
-                <div className="flex justify-center items-center text-center">
+            <div className="w-full sm:w-[540px] flex flex-col items-center">
+                <div className="w-full sm:w-[540px] flex justify-center items-center text-center">
                     <div className="w-full sm:w-[540px]">
-                        {showEditType && (
+                        {/* {showEditType && (
                             <div
                                 className="p-12 bg-yellow-100 w-100"
                                 style={{zIndex: 2001}}
@@ -55,7 +55,7 @@ export const Translate = ({currentQuestion, optionsList, title, options}) => {
                             onClick={() => setShowEditType(!showEditType)}
                         >
                             EDITAR TIPO DE EJERCICIO
-                        </button>
+                        </button> */}
                         <PhraseCard
                             title={title}
                             instruction={

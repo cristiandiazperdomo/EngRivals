@@ -57,7 +57,7 @@ export const RoomFooter = (props) => {
                                         Correct Answer:
                                     </p>
                                     <p className="text-green-800">
-                                        {answer.correctAnswer}
+                                        {answer?.correctAnswer}
                                     </p>
                                 </div>
                             </div>
@@ -86,7 +86,7 @@ export const RoomFooter = (props) => {
                                         Correct Answer:
                                     </p>
                                     <p className="text-red-800">
-                                        {answer.correctAnswer}
+                                        {answer?.correctAnswer}
                                     </p>
                                 </div>
                             </div>

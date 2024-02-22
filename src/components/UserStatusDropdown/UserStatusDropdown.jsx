@@ -4,7 +4,7 @@ export const UserStatusDropdown = () => {
     const [showDropdown, setShowDropdown] = useState(false);
 
     return (
-        <div className="absolute right-0 top-[42%]">
+        <div className="">
             <button
                 id="dropdownLeftEndButton"
                 data-dropdown-toggle="dropdownLeftEnd"

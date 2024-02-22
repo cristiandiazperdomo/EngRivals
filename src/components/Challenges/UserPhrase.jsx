@@ -28,13 +28,13 @@ export const UserPhrase = ({word, remove, position}) => {
                 <button type="submit">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        class="icon icon-tabler icon-tabler-x w-5 h-5 p-0.5 bg-red-200 text-red-600 rounded-xl"
+                        className="icon icon-tabler icon-tabler-x w-5 h-5 p-0.5 bg-red-200 text-red-600 rounded-xl"
                         viewBox="0 0 24 24"
-                        stroke-width="2"
+                        strokeWidth="2"
                         stroke="currentColor"
                         fill="none"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                     >
                         <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                         <path d="M18 6l-12 12" />

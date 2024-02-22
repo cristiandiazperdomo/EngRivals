@@ -5,6 +5,8 @@ import App from "./App.jsx";
 import "@radix-ui/themes/styles.css";
 import "./index.css";
 
+// STRICT MODE RUN USE EFFECT TWICE
+
 ReactDOM.createRoot(document.getElementById("root")).render(
     <React.StrictMode>
         <App />

@@ -1,33 +1,75 @@
-export const createChallenge = (navigate, categoryId) => {
+import {refreshToken} from "../actions/userActions";
+
+export const createChallenge = (categoryId, client, userInfo, navigate) => {
     return async (dispatch) => {
+        if (userInfo === null) return;
+        if (userInfo.level_id_level !== 1) {
+            navigate("/englishlevel");
+            return;
+        }
         try {
-            const isTheBrowserCompatibleWithAudio =
+            const isTheBrowserCompatibleWithTextToSpeech =
                 window.navigator.userAgentData.brands.some(
                     (brand) => brand.brand === "Brave"
                 )
                     ? false
                     : true;
 
-            const response = await fetch(
-                `http://localhost:8080/v1/api/challenges/${categoryId}/1`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
+            if (!isNaN(categoryId)) {
+                const socketPayload = {
+                    isTheBrowserCompatibleWithTextToSpeech,
+                };
+
+                const CREATE_CHALLENGE_URL =
+                    "/challenges/create-room/" + categoryId + "/1";
+                client.send(
+                    CREATE_CHALLENGE_URL,
+                    {
+                        Authorization:
+                            "Bearer " + localStorage.getItem("eng_token"),
                     },
-                    body: JSON.stringify({
-                        isTheBrowserCompatibleWithAudio,
-                    }),
-                }
-            );
-
-            const data = await response.json();
-
-            dispatch(getChallengeSuccess(data));
-            navigate("/rooms/" + data.id);
+                    JSON.stringify(socketPayload)
+                );
+            }
+            dispatch(refreshToken());
         } catch (error) {
             console.log(error);
         }
+    };
+};
+
+export const joinToChallenge = (
+    challengeId,
+    stompClient,
+    userInfo,
+    navigate
+) => {
+    return async (dispatch) => {
+        if (userInfo === null) return;
+        if (userInfo.level_id_level !== 1) {
+            navigate("/englishlevel");
+            return;
+        }
+        const isTheBrowserCompatibleWithTextToSpeech =
+            window.navigator.userAgentData.brands.some(
+                (brand) => brand.brand === "Brave"
+            )
+                ? false
+                : true;
+
+        const socketPayload = {
+            isTheBrowserCompatibleWithTextToSpeech,
+        };
+
+        const CREATE_CHALLENGE_URL = "/challenges/join/" + challengeId;
+        stompClient.send(
+            CREATE_CHALLENGE_URL,
+            {
+                Authorization: "Bearer " + localStorage.getItem("eng_token"),
+            },
+            JSON.stringify(socketPayload)
+        );
+        dispatch(refreshToken());
     };
 };
 
@@ -35,7 +77,14 @@ export const getChallenge = (id) => {
     return async (dispatch) => {
         try {
             const response = await fetch(
-                "http://localhost:8080/v1/api/challenges/" + id
+                "http://localhost:8080/v1/api/challenges/" + id,
+                {
+                    method: "GET",
+                    headers: {
+                        Authorization:
+                            "Bearer " + localStorage.getItem("eng_token"),
+                    },
+                }
             );
 
             dispatch(getChallengeSuccess(await response.json()));
@@ -45,28 +94,31 @@ export const getChallenge = (id) => {
     };
 };
 
-const getChallengeSuccess = (data) => ({type: "GET_CHALLENGE", payload: data});
+export const getAnswer = (challenge, setShowResult) => {
+    return async (dispatch) => {
+        dispatch(getChallengeSuccess(challenge));
+        setShowResult(true);
+    };
+};
 
-export const saveUserAnswer = (
-    questionWithAnswer,
-    challengeId,
-    setShowResult
-) => {
+export const getChallengeSuccess = (data) => ({
+    type: "GET_CHALLENGE",
+    payload: data,
+});
+
+export const saveUserAnswer = (questionWithAnswer, challengeId, client) => {
     return async (dispatch) => {
         try {
-            const response = await fetch(
-                "http://localhost:8080/v1/api/challenges/" + challengeId,
+            const CREATE_CHALLENGE_URL =
+                "/challenges/save-user-answer/" + challengeId;
+            client.send(
+                CREATE_CHALLENGE_URL,
                 {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(questionWithAnswer),
-                }
+                    Authorization:
+                        "Bearer " + localStorage.getItem("eng_token"),
+                },
+                JSON.stringify(questionWithAnswer)
             );
-
-            dispatch(getChallengeSuccess(await response.json()));
-            setShowResult(true);
         } catch (error) {
             console.log(error);
         }

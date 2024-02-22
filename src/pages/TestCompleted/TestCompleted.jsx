@@ -1,29 +1,91 @@
 import {Badge, Button} from "@radix-ui/themes";
 import * as Avatar from "@radix-ui/react-avatar";
-import {Link, useParams} from "react-router-dom";
-import {Suspense, useEffect, useState} from "react";
+import {Link, useNavigate, useParams} from "react-router-dom";
+import {useContext, useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {getChallenge} from "../../redux/actions/challengeActions";
+import {
+    getChallenge,
+    getChallengeSuccess,
+} from "../../redux/actions/challengeActions";
 
 import * as Tooltip from "@radix-ui/react-tooltip";
 
-const wordsList = ["wasting", "play", "clean", "teacher", "loyalty"];
-
-import win from "../../assets/fanfare-trumpets.mp3";
-import lose from "../../assets/happy-beeps.wav";
+import SockJS from "sockjs-client";
+import Stomp from "stompjs";
+import {CompletedTestTimer} from "../../components/CompletedTestTimer/CompletedTestTimer";
+import testCompletedSocialMedia from "../../assets/test-completed-social-media.svg";
+import noCorrectAnswer from "../../assets/no-correct-answers.svg";
+import {ProfilePicture} from "../../components/ProfilePicture/ProfilePicture";
+import {getUserInfo} from "../../redux/actions/userActions";
 
 export const TestCompleted = () => {
     const [wellAnsweredQuestions, setWellAnsweredQuestions] =
         useState(undefined);
     const [wellUsedWords, setWellUsedWords] = useState([]);
+    const [stompClient, setStompClient] = useState(null);
+    const [client, setClient] = useState(null);
+    const [noAnswers, setNoAnswers] = useState(false);
 
     const {id} = useParams();
+    const {userInfo} = useSelector((state) => state.userReducer);
+
+    const navigate = useNavigate();
 
     const dispatch = useDispatch();
     const {challenge} = useSelector((state) => state.challengeReducer);
 
     const foundWellUsedWords = () => {
+        if (wellUsedWords.length === 6) return;
         const wellUsed = [];
+
+        let hasNoAnswer = true;
+        let minimumAmountOfWords = 0;
+
+        challenge.questions.forEach((question) => {
+            question.answers.forEach((answer) => {
+                if (answer.userId === userInfo?.id) {
+                    hasNoAnswer = false;
+                    if (answer.isCorrect) {
+                        if (minimumAmountOfWords === 6) return;
+
+                        let words = [];
+                        question.title.split(" ").forEach((word) => {
+                            word?.replaceAll("?", "")
+                                ?.replaceAll(",", "")
+                                ?.replaceAll(".", "")
+                                ?.replaceAll("…", "")
+                                ?.replaceAll("!", "");
+
+                            const isNotItUseful =
+                                word === undefined ||
+                                word?.length === 0 ||
+                                word === "..." ||
+                                word === "…" ||
+                                word === "_" ||
+                                word === "." ||
+                                word === "/" ||
+                                word === "A:" ||
+                                word === "B:" ||
+                                word === "?" ||
+                                words.some((w) => w === words);
+
+                            if (!isNotItUseful) {
+                                words.push(word);
+                                minimumAmountOfWords++;
+                            }
+                        });
+                    }
+                }
+            });
+        });
+
+        minimumAmountOfWords =
+            minimumAmountOfWords > 6 ? 6 : minimumAmountOfWords;
+
+        if (hasNoAnswer) {
+            setNoAnswers(true);
+            return;
+        }
 
         let i = 0;
         do {
@@ -32,7 +94,7 @@ export const TestCompleted = () => {
             if (question === undefined) return;
 
             const wellAnswered = question.answers.find(
-                (answer) => answer.userId === "1"
+                (answer) => answer.userId === userInfo?.id
             );
 
             if (wellAnswered?.isCorrect === true) {
@@ -69,30 +131,76 @@ export const TestCompleted = () => {
             }
             i++;
             if (challenge.questions.length === i + 1) i = 0;
-        } while (wellUsed.length < 6);
+        } while (wellUsed.length < minimumAmountOfWords);
 
         setWellUsedWords(wellUsed);
     };
 
     const getWellAnsweredQuestions = () => {
-        let correctAnswersCounter = 0;
+        if (challenge === null) return;
+        const mainUserInfo = challenge.players.find(
+            (player) => player.userId == userInfo?.id
+        );
+        const opponent = challenge.players.find(
+            (player) => player.userId !== userInfo?.id
+        );
 
-        challenge.questions.forEach((question) => {
-            const loggedUserId = "1";
-            const userLoggedAnswer = question.answers.find(
-                (answer) => answer.userId === loggedUserId
-            )?.isCorrect;
-            if (userLoggedAnswer) correctAnswersCounter++;
-        });
+        const usersWellAnsweredQuestions = {
+            mainUser: mainUserInfo.points === 0 ? 0 : mainUserInfo.points / 2,
+            opponent: opponent.points === 0 ? 0 : opponent.points / 2,
+        };
 
-        setWellAnsweredQuestions(correctAnswersCounter);
+        setWellAnsweredQuestions(usersWellAnsweredQuestions);
     };
+
+    const handleBackToGroupChallenges = () => {
+        dispatch(getChallengeSuccess(null));
+        navigate("/grouplessons");
+    };
+
+    useEffect(() => {
+        if (userInfo === null) dispatch(getUserInfo(navigate));
+    }, []);
 
     useEffect(() => {
         if (challenge === null) {
             dispatch(getChallenge(id));
         }
     }, []);
+
+    useEffect(() => {
+        if (client !== null) return;
+        if (userInfo === null) return;
+        const socket = new SockJS("http://localhost:8080/ws");
+        const stompClientInstance = Stomp.over(socket);
+        stompClientInstance.connect(
+            {
+                Authorization: "Bearer " + localStorage.getItem("eng_token"),
+            },
+            (frame) => {
+                stompClientInstance.subscribe(
+                    "/rooms/results/" + id,
+                    (message) => {
+                        const challenge = JSON.parse(message.body);
+                        if (challenge.status) {
+                            alert(challenge.status);
+                        } else {
+                            dispatch(getChallengeSuccess(challenge));
+                        }
+                    },
+                    {
+                        Authorization:
+                            "Bearer " + localStorage.getItem("eng_token"),
+                    }
+                );
+                setClient(stompClientInstance);
+            },
+            (error) => {
+                console.error("Error al conectar:", error);
+                // Manejar el error de conexión aquí
+            }
+        );
+    }, [userInfo]);
 
     useEffect(() => {
         if (challenge !== null && !(challenge instanceof Promise)) {
@@ -103,56 +211,50 @@ export const TestCompleted = () => {
 
     return (
         <div className="w-full flex min-h-screen items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-screen w-full">
-                <rect fill="#fff" />
-                <path
-                    fill="#FF7"
-                    d="M1102.5 734.8c2.5-1.2 24.8-8.6 25.6-7.5.5.7-3.9 23.8-4.6 24.5C1123.3 752.1 1107.5 739.5 1102.5 734.8zM1226.3 229.1c0-.1-4.9-9.4-7-14.2-.1-.3-.3-1.1-.4-1.6-.1-.4-.3-.7-.6-.9-.3-.2-.6-.1-.8.1l-13.1 12.3c0 0 0 0 0 0-.2.2-.3.5-.4.8 0 .3 0 .7.2 1 .1.1 1.4 2.5 2.1 3.6 2.4 3.7 6.5 12.1 6.5 12.2.2.3.4.5.7.6.3 0 .5-.1.7-.3 0 0 1.8-2.5 2.7-3.6 1.5-1.6 3-3.2 4.6-4.7 1.2-1.2 1.6-1.4 2.1-1.6.5-.3 1.1-.5 2.5-1.9C1226.5 230.4 1226.6 229.6 1226.3 229.1zM33 770.3C33 770.3 33 770.3 33 770.3c0-.7-.5-1.2-1.2-1.2-.1 0-.3 0-.4.1-1.6.2-14.3.1-22.2 0-.3 0-.6.1-.9.4-.2.2-.4.5-.4.9 0 .2 0 4.9.1 5.9l.4 13.6c0 .3.2.6.4.9.2.2.5.3.8.3 0 0 .1 0 .1 0 7.3-.7 14.7-.9 22-.6.3 0 .7-.1.9-.3.2-.2.4-.6.4-.9C32.9 783.3 32.9 776.2 33 770.3z"
-                />
-                <path
-                    fill="#BAFFE8"
-                    d="M171.1 383.4c1.3-2.5 14.3-22 15.6-21.6.8.3 11.5 21.2 11.5 22.1C198.1 384.2 177.9 384 171.1 383.4zM596.4 711.8c-.1-.1-6.7-8.2-9.7-12.5-.2-.3-.5-1-.7-1.5-.2-.4-.4-.7-.7-.8-.3-.1-.6 0-.8.3L574 712c0 0 0 0 0 0-.2.2-.2.5-.2.9 0 .3.2.7.4.9.1.1 1.8 2.2 2.8 3.1 3.1 3.1 8.8 10.5 8.9 10.6.2.3.5.4.8.4.3 0 .5-.2.6-.5 0 0 1.2-2.8 2-4.1 1.1-1.9 2.3-3.7 3.5-5.5.9-1.4 1.3-1.7 1.7-2 .5-.4 1-.7 2.1-2.4C596.9 713.1 596.8 712.3 596.4 711.8zM727.5 179.9C727.5 179.9 727.5 179.9 727.5 179.9c.6.2 1.3-.2 1.4-.8 0-.1 0-.2 0-.4.2-1.4 2.8-12.6 4.5-19.5.1-.3 0-.6-.2-.8-.2-.3-.5-.4-.8-.5-.2 0-4.7-1.1-5.7-1.3l-13.4-2.7c-.3-.1-.7 0-.9.2-.2.2-.4.4-.5.6 0 0 0 .1 0 .1-.8 6.5-2.2 13.1-3.9 19.4-.1.3 0 .6.2.9.2.3.5.4.8.5C714.8 176.9 721.7 178.5 727.5 179.9zM728.5 178.1c-.1-.1-.2-.2-.4-.2C728.3 177.9 728.4 178 728.5 178.1z"
-                />
-                <g fillOpacity="0.93" fill="#FFF">
-                    <path d="M699.6 472.7c-1.5 0-2.8-.8-3.5-2.3-.8-1.9 0-4.2 1.9-5 3.7-1.6 6.8-4.7 8.4-8.5 1.6-3.8 1.7-8.1.2-11.9-.3-.9-.8-1.8-1.2-2.8-.8-1.7-1.8-3.7-2.3-5.9-.9-4.1-.2-8.6 2-12.8 1.7-3.1 4.1-6.1 7.6-9.1 1.6-1.4 4-1.2 5.3.4 1.4 1.6 1.2 4-.4 5.3-2.8 2.5-4.7 4.7-5.9 7-1.4 2.6-1.9 5.3-1.3 7.6.3 1.4 1 2.8 1.7 4.3.5 1.1 1 2.2 1.5 3.3 2.1 5.6 2 12-.3 17.6-2.3 5.5-6.8 10.1-12.3 12.5C700.6 472.6 700.1 472.7 699.6 472.7zM740.4 421.4c1.5-.2 3 .5 3.8 1.9 1.1 1.8.4 4.2-1.4 5.3-3.7 2.1-6.4 5.6-7.6 9.5-1.2 4-.8 8.4 1.1 12.1.4.9 1 1.7 1.6 2.7 1 1.7 2.2 3.5 3 5.7 1.4 4 1.2 8.7-.6 13.2-1.4 3.4-3.5 6.6-6.8 10.1-1.5 1.6-3.9 1.7-5.5.2-1.6-1.4-1.7-3.9-.2-5.4 2.6-2.8 4.3-5.3 5.3-7.7 1.1-2.8 1.3-5.6.5-7.9-.5-1.3-1.3-2.7-2.2-4.1-.6-1-1.3-2.1-1.9-3.2-2.8-5.4-3.4-11.9-1.7-17.8 1.8-5.9 5.8-11 11.2-14C739.4 421.6 739.9 421.4 740.4 421.4zM261.3 590.9c5.7 6.8 9 15.7 9.4 22.4.5 7.3-2.4 16.4-10.2 20.4-3 1.5-6.7 2.2-11.2 2.2-7.9-.1-12.9-2.9-15.4-8.4-2.1-4.7-2.3-11.4 1.8-15.9 3.2-3.5 7.8-4.1 11.2-1.6 1.2.9 1.5 2.7.6 3.9-.9 1.2-2.7 1.5-3.9.6-1.8-1.3-3.6.6-3.8.8-2.4 2.6-2.1 7-.8 9.9 1.5 3.4 4.7 5 10.4 5.1 3.6 0 6.4-.5 8.6-1.6 4.7-2.4 7.7-8.6 7.2-15-.5-7.3-5.3-18.2-13-23.9-4.2-3.1-8.5-4.1-12.9-3.1-3.1.7-6.2 2.4-9.7 5-6.6 5.1-11.7 11.8-14.2 19-2.7 7.7-2.1 15.8 1.9 23.9.7 1.4.1 3.1-1.3 3.7-1.4.7-3.1.1-3.7-1.3-4.6-9.4-5.4-19.2-2.2-28.2 2.9-8.2 8.6-15.9 16.1-21.6 4.1-3.1 8-5.1 11.8-6 6-1.4 12 0 17.5 4C257.6 586.9 259.6 588.8 261.3 590.9z" />
-                    <circle cx="1013.7" cy="153.9" r="7.1" />
-                    <circle cx="1024.3" cy="132.1" r="7.1" />
-                    <circle cx="1037.3" cy="148.9" r="7.1" />
-                    <path d="M1508.7 297.2c-4.8-5.4-9.7-10.8-14.8-16.2 5.6-5.6 11.1-11.5 15.6-18.2 1.2-1.7.7-4.1-1-5.2-1.7-1.2-4.1-.7-5.2 1-4.2 6.2-9.1 11.6-14.5 16.9-4.8-5-9.7-10-14.7-14.9-1.5-1.5-3.9-1.5-5.3 0-1.5 1.5-1.5 3.9 0 5.3 4.9 4.8 9.7 9.8 14.5 14.8-1.1 1.1-2.3 2.2-3.5 3.2-4.1 3.8-8.4 7.8-12.4 12-1.4 1.5-1.4 3.8 0 5.3 0 0 0 0 0 0 1.5 1.4 3.9 1.4 5.3-.1 3.9-4 8.1-7.9 12.1-11.7 1.2-1.1 2.3-2.2 3.5-3.3 4.9 5.3 9.8 10.6 14.6 15.9.1.1.1.1.2.2 1.4 1.4 3.7 1.5 5.2.2C1510 301.2 1510.1 298.8 1508.7 297.2zM327.6 248.6l-.4-2.6c-1.5-11.1-2.2-23.2-2.3-37 0-5.5 0-11.5.2-18.5 0-.7 0-1.5 0-2.3 0-5 0-11.2 3.9-13.5 2.2-1.3 5.1-1 8.5.9 5.7 3.1 13.2 8.7 17.5 14.9 5.5 7.8 7.3 16.9 5 25.7-3.2 12.3-15 31-30 32.1L327.6 248.6zM332.1 179.2c-.2 0-.3 0-.4.1-.1.1-.7.5-1.1 2.7-.3 1.9-.3 4.2-.3 6.3 0 .8 0 1.7 0 2.4-.2 6.9-.2 12.8-.2 18.3.1 12.5.7 23.5 2 33.7 11-2.7 20.4-18.1 23-27.8 1.9-7.2.4-14.8-4.2-21.3l0 0C347 188.1 340 183 335 180.3 333.6 179.5 332.6 179.2 332.1 179.2zM516.3 60.8c-.1 0-.2 0-.4-.1-2.4-.7-4-.9-6.7-.7-.7 0-1.3-.5-1.4-1.2 0-.7.5-1.3 1.2-1.4 3.1-.2 4.9 0 7.6.8.7.2 1.1.9.9 1.6C517.3 60.4 516.8 60.8 516.3 60.8zM506.1 70.5c-.5 0-1-.3-1.2-.8-.8-2.1-1.2-4.3-1.3-6.6 0-.7.5-1.3 1.2-1.3.7 0 1.3.5 1.3 1.2.1 2 .5 3.9 1.1 5.8.2.7-.1 1.4-.8 1.6C506.4 70.5 506.2 70.5 506.1 70.5zM494.1 64.4c-.4 0-.8-.2-1-.5-.4-.6-.3-1.4.2-1.8 1.8-1.4 3.7-2.6 5.8-3.6.6-.3 1.4 0 1.7.6.3.6 0 1.4-.6 1.7-1.9.9-3.7 2-5.3 3.3C494.7 64.3 494.4 64.4 494.1 64.4zM500.5 55.3c-.5 0-.9-.3-1.2-.7-.5-1-1.2-1.9-2.4-3.4-.3-.4-.7-.9-1.1-1.4-.4-.6-.3-1.4.2-1.8.6-.4 1.4-.3 1.8.2.4.5.8 1 1.1 1.4 1.3 1.6 2.1 2.6 2.7 3.9.3.6 0 1.4-.6 1.7C500.9 55.3 500.7 55.3 500.5 55.3zM506.7 55c-.3 0-.5-.1-.8-.2-.6-.4-.7-1.2-.3-1.8 1.2-1.7 2.3-3.4 3.3-5.2.3-.6 1.1-.9 1.7-.5.6.3.9 1.1.5 1.7-1 1.9-2.2 3.8-3.5 5.6C507.4 54.8 507.1 55 506.7 55zM1029.3 382.8c-.1 0-.2 0-.4-.1-2.4-.7-4-.9-6.7-.7-.7 0-1.3-.5-1.4-1.2 0-.7.5-1.3 1.2-1.4 3.1-.2 4.9 0 7.6.8.7.2 1.1.9.9 1.6C1030.3 382.4 1029.8 382.8 1029.3 382.8zM1019.1 392.5c-.5 0-1-.3-1.2-.8-.8-2.1-1.2-4.3-1.3-6.6 0-.7.5-1.3 1.2-1.3.7 0 1.3.5 1.3 1.2.1 2 .5 3.9 1.1 5.8.2.7-.1 1.4-.8 1.6C1019.4 392.5 1019.2 392.5 1019.1 392.5zM1007.1 386.4c-.4 0-.8-.2-1-.5-.4-.6-.3-1.4.2-1.8 1.8-1.4 3.7-2.6 5.8-3.6.6-.3 1.4 0 1.7.6.3.6 0 1.4-.6 1.7-1.9.9-3.7 2-5.3 3.3C1007.7 386.3 1007.4 386.4 1007.1 386.4zM1013.5 377.3c-.5 0-.9-.3-1.2-.7-.5-1-1.2-1.9-2.4-3.4-.3-.4-.7-.9-1.1-1.4-.4-.6-.3-1.4.2-1.8.6-.4 1.4-.3 1.8.2.4.5.8 1 1.1 1.4 1.3 1.6 2.1 2.6 2.7 3.9.3.6 0 1.4-.6 1.7C1013.9 377.3 1013.7 377.3 1013.5 377.3zM1019.7 377c-.3 0-.5-.1-.8-.2-.6-.4-.7-1.2-.3-1.8 1.2-1.7 2.3-3.4 3.3-5.2.3-.6 1.1-.9 1.7-.5.6.3.9 1.1.5 1.7-1 1.9-2.2 3.8-3.5 5.6C1020.4 376.8 1020.1 377 1019.7 377zM1329.7 573.4c-1.4 0-2.9-.2-4.5-.7-8.4-2.7-16.6-12.7-18.7-20-.4-1.4-.7-2.9-.9-4.4-8.1 3.3-15.5 10.6-15.4 21 0 1.5-1.2 2.7-2.7 2.8 0 0 0 0 0 0-1.5 0-2.7-1.2-2.7-2.7-.1-6.7 2.4-12.9 7-18 3.6-4 8.4-7.1 13.7-8.8.5-6.5 3.1-12.9 7.4-17.4 7-7.4 18.2-8.9 27.3-10.1l.7-.1c1.5-.2 2.9.9 3.1 2.3.2 1.5-.9 2.9-2.3 3.1l-.7.1c-8.6 1.2-18.4 2.5-24 8.4-3 3.2-5 7.7-5.7 12.4 7.9-1 17.7 1.3 24.3 5.7 4.3 2.9 7.1 7.8 7.2 12.7.2 4.3-1.7 8.3-5.2 11.1C1335.2 572.4 1332.6 573.4 1329.7 573.4zM1311 546.7c.1 1.5.4 3 .8 4.4 1.7 5.8 8.7 14.2 15.1 16.3 2.8.9 5.1.5 7.2-1.1 2.7-2.1 3.2-4.8 3.1-6.6-.1-3.2-2-6.4-4.8-8.3C1326.7 547.5 1317.7 545.6 1311 546.7z" />
-                </g>
-            </svg>
-            <div className="absolute w-full sm:w-[520px] bg-white bg-opacity-50 rounded-xl">
+            <div className="w-full sm:w-[520px] bg-white bg-opacity-50 rounded-xl">
                 <div className="flex justify-center mx-4 my-8">
                     <div className="w-full flex flex-col justify-center">
-                        <Badge size="2" color="green" className="w-24">
-                            Completed
-                        </Badge>
-                        <h2 className="text-2xl font-bold my-4 text-center">
-                            {challenge?.title}
-                        </h2>
-                        <div className="grid grid-cols-2 mb-2 justify-left">
-                            <div className="flex flex-col items-center">
-                                <div className="flex flex-col items-center">
-                                    <Avatar.Root className="bg-blackA1 inline-flex h-[45px] w-[45px] select-none items-center justify-center overflow-hidden rounded-full align-middle">
-                                        <Avatar.Image
-                                            className="h-full w-full rounded-[inherit] object-cover"
-                                            src="https://images.unsplash.com/photo-1492633423870-43d1cd2775eb?&w=128&h=128&dpr=2&q=80"
-                                            alt="Colm Tuite"
-                                        />
-                                        <Avatar.Fallback
-                                            className="text-violet11 leading-1 flex h-full w-full items-center justify-center bg-white text-[15px] font-medium"
-                                            delayMs={600}
-                                        >
-                                            CT
-                                        </Avatar.Fallback>
-                                    </Avatar.Root>
-                                    <div className="flex">
-                                        <div className="flex text-xs text-slate-900 bg-red-50 rounded-l-xl -mt-2 p-1">
+                        {challenge?.players?.find(
+                            (player) => player.userId === userInfo?.id
+                        )?.finishTime !== null &&
+                            challenge?.players?.find(
+                                (player) => player.userId !== userInfo?.id
+                            )?.finishTime && (
+                                <>
+                                    {wellAnsweredQuestions?.mainUser >
+                                    wellAnsweredQuestions?.opponent ? (
+                                        <div className="p-1 bg-green-100 rounded-md flex items-center w-[100px] space-x-1 animate-pulsing justify-center">
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"
-                                                className="icon icon-tabler icon-tabler-clock-hour-12 w-4"
+                                                className="icon icon-tabler icon-tabler-mood-xd w-6 h-6 text-green-800 z-10"
                                                 viewBox="0 0 24 24"
-                                                strokeWidth="2"
+                                                strokeWidth="1.5"
+                                                stroke="currentColor"
+                                                fill="none"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                            >
+                                                <path
+                                                    stroke="none"
+                                                    d="M0 0h24v24H0z"
+                                                    fill="none"
+                                                />
+                                                <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" />
+                                                <path d="M9 14h6a3 3 0 0 1 -6 0z" />
+                                                <path d="M9 8l6 3" />
+                                                <path d="M9 11l6 -3" />
+                                            </svg>
+                                            <span className="text-green-900 flex flex-row font-medium">
+                                                You win
+                                            </span>
+                                        </div>
+                                    ) : (
+                                        <div className="p-1 bg-red-100 rounded-md flex items-center w-[120px] space-x-1 justify-center">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                className="icon icon-tabler icon-tabler-mood-wink w-6 h-6 text-red-800 z-10"
+                                                viewBox="0 0 24 24"
+                                                strokeWidth="1.5"
                                                 stroke="currentColor"
                                                 fill="none"
                                                 strokeLinecap="round"
@@ -164,54 +266,67 @@ export const TestCompleted = () => {
                                                     fill="none"
                                                 />
                                                 <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
-                                                <path d="M12 7v5" />
+                                                <path d="M15 10h.01" />
+                                                <path d="M9.5 15a3.5 3.5 0 0 0 5 0" />
+                                                <path d="M8.5 8.5l1.5 1.5l-1.5 1.5" />
                                             </svg>
-                                            1.42s
+                                            <span className="text-red-900 flex flex-row font-medium">
+                                                Next time
+                                            </span>
                                         </div>
+                                    )}
+                                </>
+                            )}
+                        <h2 className="text-2xl font-bold my-4 text-center">
+                            {challenge?.title}
+                        </h2>
+                        <div className="grid grid-cols-2 mb-2 justify-left">
+                            <div className="flex flex-col items-center">
+                                <div className="flex flex-col items-center space-y-2">
+                                    <ProfilePicture name={userInfo?.name} />
+                                    <div className="flex">
+                                        <CompletedTestTimer
+                                            creationTime={
+                                                challenge?.creationTime
+                                            }
+                                            finishTime={
+                                                challenge?.players?.find(
+                                                    (player) =>
+                                                        player.userId ===
+                                                        userInfo?.id
+                                                )?.finishTime
+                                            }
+                                        />
                                         <div className="flex text-xs text-slate-900 bg-blue-100 rounded-r-xl -mt-2 p-1 font-bold">
-                                            {wellAnsweredQuestions} correct
+                                            {wellAnsweredQuestions?.mainUser}{" "}
+                                            correct
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex flex-col items-center">
-                                <Avatar.Root className="bg-blackA1 inline-flex h-[45px] w-[45px] select-none items-center justify-center overflow-hidden rounded-full align-middle">
-                                    <Avatar.Image
-                                        className="h-full w-full rounded-[inherit] object-cover"
-                                        src="https://images.unsplash.com/photo-1511485977113-f34c92461ad9?ixlib=rb-1.2.1&w=128&h=128&dpr=2&q=80"
-                                        alt="Pedro Duarte"
-                                    />
-                                    <Avatar.Fallback
-                                        className="text-violet11 leading-1 flex h-full w-full items-center justify-center bg-white text-[15px] font-medium"
-                                        delayMs={600}
-                                    >
-                                        JD
-                                    </Avatar.Fallback>
-                                </Avatar.Root>
+                            <div className="flex flex-col items-center space-y-2">
+                                <ProfilePicture
+                                    name={
+                                        challenge?.players?.find(
+                                            (player) =>
+                                                player.userId !== userInfo?.id
+                                        )?.name
+                                    }
+                                />
                                 <div className="flex">
-                                    <div className="flex text-xs text-slate-900 bg-red-50 rounded-l-xl -mt-2 p-1">
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            className="icon icon-tabler icon-tabler-clock-hour-12 w-4"
-                                            viewBox="0 0 24 24"
-                                            strokeWidth="2"
-                                            stroke="currentColor"
-                                            fill="none"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                        >
-                                            <path
-                                                stroke="none"
-                                                d="M0 0h24v24H0z"
-                                                fill="none"
-                                            />
-                                            <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
-                                            <path d="M12 7v5" />
-                                        </svg>
-                                        +2.10s
-                                    </div>
+                                    <CompletedTestTimer
+                                        creationTime={challenge?.creationTime}
+                                        finishTime={
+                                            challenge?.players?.find(
+                                                (player) =>
+                                                    player.userId !==
+                                                    userInfo?.id
+                                            )?.finishTime
+                                        }
+                                    />
                                     <div className="flex text-xs text-slate-900 bg-blue-100 rounded-r-xl -mt-2 p-1 font-bold">
-                                        12 correct
+                                        {wellAnsweredQuestions?.opponent}{" "}
+                                        correct
                                     </div>
                                 </div>
                             </div>
@@ -223,117 +338,142 @@ export const TestCompleted = () => {
                                     color="green"
                                     className="text-md"
                                 >
-                                    +13
+                                    +6
                                 </Badge>
                                 <span className="text-md text-black">
                                     Well used words
                                 </span>
                             </div>
                         </div>
-                        <Suspense fallback={<div>buenas tarde</div>}>
-                            <div>
-                                <ul className="my-4 space-y-2">
-                                    {wellUsedWords?.map((word, index) => (
-                                        <li
-                                            className="flex justify-between w-full border rounded-xl p-1.5"
-                                            key={index}
-                                        >
-                                            <div className="flex text-lg justify-between w-full">
-                                                <div className="flex">
-                                                    <svg
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        className="icon icon-tabler icon-tabler-circle-check-filled text-green-500 w-8 mr-4"
-                                                        viewBox="0 0 24 24"
-                                                        strokeWidth="2"
-                                                        stroke="currentColor"
-                                                        fill="none"
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                    >
-                                                        <path
-                                                            stroke="none"
-                                                            d="M0 0h24v24H0z"
+                        <div>
+                            {noAnswers === true ? (
+                                <div className="w-full h-[350px] flex flex-col justify-center items-center">
+                                    <img
+                                        src={testCompletedSocialMedia}
+                                        alt="social-media-total-distracted"
+                                        className="w-[200px] h-[200px]"
+                                    />
+                                    <span className="font-bold">
+                                        You didn't answer any question
+                                    </span>
+                                </div>
+                            ) : (
+                                <ul className="my-4 space-y-2 w-full h-[350px]">
+                                    {wellUsedWords.length === 0 ? (
+                                        <div className="w-full h-full flex flex-col justify-center items-center">
+                                            <img
+                                                src={noCorrectAnswer}
+                                                alt="social-media-total-distracted"
+                                                className="w-[200px] h-[200px]"
+                                            />
+                                            <span className="font-bold">
+                                                You didn't answer any questions
+                                                correctly.
+                                            </span>
+                                        </div>
+                                    ) : (
+                                        wellUsedWords?.map((word, index) => (
+                                            <li
+                                                className="flex justify-between w-full border rounded-xl p-1.5"
+                                                key={index}
+                                            >
+                                                <div className="flex text-lg justify-between w-full">
+                                                    <div className="flex">
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            className="icon icon-tabler icon-tabler-circle-check-filled text-green-500 w-8 mr-4"
+                                                            viewBox="0 0 24 24"
+                                                            strokeWidth="2"
+                                                            stroke="currentColor"
                                                             fill="none"
-                                                        />
-                                                        <path
-                                                            d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-1.293 5.953a1 1 0 0 0 -1.32 -.083l-.094 .083l-3.293 3.292l-1.293 -1.292l-.094 -.083a1 1 0 0 0 -1.403 1.403l.083 .094l2 2l.094 .083a1 1 0 0 0 1.226 0l.094 -.083l4 -4l.083 -.094a1 1 0 0 0 -.083 -1.32z"
-                                                            strokeWidth="0"
-                                                            fill="currentColor"
-                                                        />
-                                                    </svg>
-                                                    {word}
-                                                </div>
-                                                <Tooltip.Provider>
-                                                    <Tooltip.Root>
-                                                        <Tooltip.Trigger
-                                                            asChild
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
                                                         >
-                                                            <Link
-                                                                to={
-                                                                    "https://dictionary.cambridge.org/es/diccionario/ingles-espanol/" +
-                                                                    word
-                                                                }
-                                                                target="_blank"
+                                                            <path
+                                                                stroke="none"
+                                                                d="M0 0h24v24H0z"
+                                                                fill="none"
+                                                            />
+                                                            <path
+                                                                d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-1.293 5.953a1 1 0 0 0 -1.32 -.083l-.094 .083l-3.293 3.292l-1.293 -1.292l-.094 -.083a1 1 0 0 0 -1.403 1.403l.083 .094l2 2l.094 .083a1 1 0 0 0 1.226 0l.094 -.083l4 -4l.083 -.094a1 1 0 0 0 -.083 -1.32z"
+                                                                strokeWidth="0"
+                                                                fill="currentColor"
+                                                            />
+                                                        </svg>
+                                                        {word}
+                                                    </div>
+                                                    <Tooltip.Provider>
+                                                        <Tooltip.Root>
+                                                            <Tooltip.Trigger
+                                                                asChild
                                                             >
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    className="icon icon-tabler icon-tabler-external-link transition-all duration-150 text-gray-300 hover:text-gray-600 cursor-pointer"
-                                                                    width="24"
-                                                                    height="24"
-                                                                    viewBox="0 0 24 24"
-                                                                    strokeWidth="2"
-                                                                    stroke="currentColor"
-                                                                    fill="none"
-                                                                    strokeLinecap="round"
-                                                                    strokeLinejoin="round"
+                                                                <Link
+                                                                    to={
+                                                                        "https://dictionary.cambridge.org/es/diccionario/ingles-espanol/" +
+                                                                        word
+                                                                    }
+                                                                    target="_blank"
                                                                 >
-                                                                    <path
-                                                                        stroke="none"
-                                                                        d="M0 0h24v24H0z"
+                                                                    <svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        className="icon icon-tabler icon-tabler-external-link transition-all duration-150 text-gray-300 hover:text-gray-600 cursor-pointer"
+                                                                        width="24"
+                                                                        height="24"
+                                                                        viewBox="0 0 24 24"
+                                                                        strokeWidth="2"
+                                                                        stroke="currentColor"
                                                                         fill="none"
-                                                                    />
-                                                                    <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6" />
-                                                                    <path d="M11 13l9 -9" />
-                                                                    <path d="M15 4h5v5" />
-                                                                </svg>
-                                                            </Link>
-                                                        </Tooltip.Trigger>
-                                                        <Tooltip.Portal>
-                                                            <Tooltip.Content
-                                                                className="data-[state=delayed-open]:data-[side=top]:animate-slideDownAndFade data-[state=delayed-open]:data-[side=right]:animate-slideLeftAndFade data-[state=delayed-open]:data-[side=left]:animate-slideRightAndFade data-[state=delayed-open]:data-[side=bottom]:animate-slideUpAndFade text-violet11 select-none rounded-[4px] bg-white px-[15px] py-[10px] text-[15px] leading-none shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] will-change-[transform,opacity]"
-                                                                sideOffset={5}
-                                                            >
-                                                                <span className="text-xs text-gray-500">
-                                                                    See more
-                                                                    info in{" "}
-                                                                </span>
-                                                                <span className="font-bold text-xs text-gray-600">
-                                                                    Cambridge
-                                                                    Dictionary
-                                                                </span>
-                                                                <Tooltip.Arrow className="fill-white" />
-                                                            </Tooltip.Content>
-                                                        </Tooltip.Portal>
-                                                    </Tooltip.Root>
-                                                </Tooltip.Provider>
-                                            </div>
-                                        </li>
-                                    ))}
+                                                                        strokeLinecap="round"
+                                                                        strokeLinejoin="round"
+                                                                    >
+                                                                        <path
+                                                                            stroke="none"
+                                                                            d="M0 0h24v24H0z"
+                                                                            fill="none"
+                                                                        />
+                                                                        <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6" />
+                                                                        <path d="M11 13l9 -9" />
+                                                                        <path d="M15 4h5v5" />
+                                                                    </svg>
+                                                                </Link>
+                                                            </Tooltip.Trigger>
+                                                            <Tooltip.Portal>
+                                                                <Tooltip.Content
+                                                                    className="data-[state=delayed-open]:data-[side=top]:animate-slideDownAndFade data-[state=delayed-open]:data-[side=right]:animate-slideLeftAndFade data-[state=delayed-open]:data-[side=left]:animate-slideRightAndFade data-[state=delayed-open]:data-[side=bottom]:animate-slideUpAndFade text-violet11 select-none rounded-[4px] bg-white px-[15px] py-[10px] text-[15px] leading-none shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] will-change-[transform,opacity]"
+                                                                    sideOffset={
+                                                                        5
+                                                                    }
+                                                                >
+                                                                    <span className="text-xs text-gray-500">
+                                                                        See more
+                                                                        info in{" "}
+                                                                    </span>
+                                                                    <span className="font-bold text-xs text-gray-600">
+                                                                        Cambridge
+                                                                        Dictionary
+                                                                    </span>
+                                                                    <Tooltip.Arrow className="fill-white" />
+                                                                </Tooltip.Content>
+                                                            </Tooltip.Portal>
+                                                        </Tooltip.Root>
+                                                    </Tooltip.Provider>
+                                                </div>
+                                            </li>
+                                        ))
+                                    )}
                                 </ul>
-                            </div>
-                        </Suspense>
+                            )}
+                        </div>
                         <div className="text-yellow-500 text-2xl justify-center flex space-x-2 font-bold">
                             <p>+</p>
                             <p>
-                                {
-                                    challenge?.points?.find(
-                                        (point) => point.userId === "2"
-                                    ).points
-                                }
+                                {wellAnsweredQuestions?.mainUser !==
+                                    undefined &&
+                                    wellAnsweredQuestions?.mainUser * 2}
                             </p>
                             <p>XP</p>
                         </div>
-                        <Link to="/groupchallenges">
+                        <div onClick={handleBackToGroupChallenges}>
                             <Button
                                 color="green"
                                 className="w-full mb-3"
@@ -341,22 +481,26 @@ export const TestCompleted = () => {
                             >
                                 Finish
                             </Button>
-                        </Link>
+                        </div>
                         <div className="grid grid-cols-1 w-full">
                             {[
                                 {
-                                    score: wellAnsweredQuestions,
+                                    score: wellAnsweredQuestions?.mainUser,
                                     criterion: "Answered Correctly",
                                 },
                                 {
                                     score: Math.floor(
-                                        (wellAnsweredQuestions * 100) /
+                                        (wellAnsweredQuestions?.mainUser *
+                                            100) /
                                             challenge?.questions?.length
                                     ),
                                     criterion: "Accuracy",
                                 },
                             ].map((criteria) => (
-                                <div className="bg-gray-50 rounded-b-xl p-4 text-center border-b-2 first:rounded-t-xl first:rounded-b-none last:mt-4">
+                                <div
+                                    className="bg-gray-50 rounded-b-xl p-4 text-center border-b-2 first:rounded-t-xl first:rounded-b-none last:mt-4"
+                                    key={criteria?.score}
+                                >
                                     <p className="text-green-700 text-2xl font-bold">
                                         {criteria.score}
                                         {criteria.criterion === "Accuracy"

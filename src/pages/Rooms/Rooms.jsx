@@ -3,26 +3,31 @@ import {Translate} from "../../components/Challenges/Translate";
 import {UserStatusDropdown} from "../../components/UserStatusDropdown/UserStatusDropdown";
 import {RoomHeader} from "../../components/RoomHeader/RoomHeader";
 import {RoomFooter} from "../../components/RoomFooter/RoomFooter";
-import {useEffect, useRef, useState} from "react";
+import {useContext, useEffect, useRef, useState} from "react";
 import {
     getChallenge,
+    getChallengeSuccess,
     saveUserAnswer,
 } from "../../redux/actions/challengeActions";
 import {useDispatch, useSelector} from "react-redux";
 import {useNavigate, useParams} from "react-router-dom";
 import {OpenQuestion} from "../../components/Challenges/OpenQuestion";
+import {MyContext} from "../../context/AppContext";
 
 import mistake from "../../assets/germanio_trumpet-e4.wav";
 import right from "../../assets/powerupsuccess.wav";
 
 import suspense from "../../assets/orchestra-end-game.mp3";
+import SockJS from "sockjs-client";
+import Stomp from "stompjs";
+import {getUserInfo} from "../../redux/actions/userActions";
 
 export const Rooms = () => {
     const [currentQuestion, setCurrentQuestion] = useState(null);
-    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(undefined);
     const [showResult, setShowResult] = useState(false);
-
     const [showDelete, setShowDelete] = useState(false);
+    const [hideQuestions, setHideQuestions] = useState(true);
+    const [client, setClient] = useState(null);
 
     const optionsList = useRef();
     const userPhraseRef = useRef();
@@ -42,7 +47,9 @@ export const Rooms = () => {
             if (question.answers === null || question.answers.length === 0) {
                 indexesOfNotAnsweredsQuestions.push(index);
             } else if (
-                question.answers.some((answer) => answer.userId === userInfo.id)
+                !question.answers.some(
+                    (answer) => answer.userId === userInfo.id
+                )
             ) {
                 indexesOfNotAnsweredsQuestions.push(index);
             }
@@ -70,8 +77,8 @@ export const Rooms = () => {
             audio.preload = "auto";
             audio.volume = 0.9;
             audio.play();
+            console.log("acá", areThere);
             navigate("/completed/" + id);
-            return;
         }
 
         let getRandomNumber = 0;
@@ -147,7 +154,7 @@ export const Rooms = () => {
         questionWithAnswer.answers = [
             {
                 answer: option?.name,
-                userId: 1,
+                userId: userInfo.id,
             },
         ];
 
@@ -165,12 +172,10 @@ export const Rooms = () => {
 
         const questionWithAnswer = structuredClone(currentQuestion);
 
-        console.log(completeAnswer, "complete answer");
-
         questionWithAnswer.answers = [
             {
                 answer: completeAnswer.slice(1, completeAnswer.length),
-                userId: 1,
+                userId: userInfo?.id,
             },
         ];
 
@@ -194,7 +199,7 @@ export const Rooms = () => {
         questionWithAnswer.answers = [
             {
                 answer: option?.name,
-                userId: 1,
+                userId: userInfo?.id,
             },
         ];
 
@@ -214,12 +219,11 @@ export const Rooms = () => {
 
         if (questionWithAnswer === null) return;
 
-        dispatch(saveUserAnswer(questionWithAnswer, id, setShowResult));
+        dispatch(saveUserAnswer(questionWithAnswer, id, client));
     };
 
     useEffect(() => {
         window.speechSynthesis.cancel();
-        console.log(window.speechSynthesis.speaking, "is this shit speaking");
     }, [currentQuestion]);
 
     useEffect(() => {
@@ -229,17 +233,63 @@ export const Rooms = () => {
     }, []);
 
     useEffect(() => {
-        if (!currentQuestion?.answers?.find((answer) => answer.userId === "1"))
+        if (userInfo === null) dispatch(getUserInfo());
+    }, []);
+
+    useEffect(() => {
+        if (client !== null) return;
+        if (userInfo === null) return;
+        const socket = new SockJS("http://localhost:8080/ws");
+        const stompClientInstance = Stomp.over(socket);
+        stompClientInstance.connect(
+            {
+                Authorization: "Bearer " + localStorage.getItem("eng_token"),
+            },
+            (frame) => {
+                stompClientInstance.subscribe(
+                    "/rooms/game/" + userInfo?.id,
+                    (message) => {
+                        const challenge = JSON.parse(message.body);
+                        if (challenge.status) {
+                            alert(challenge.status);
+                        } else {
+                            dispatch(
+                                getChallengeSuccess(challenge, setShowResult)
+                            );
+                        }
+                    },
+                    {
+                        Authorization:
+                            "Bearer " + localStorage.getItem("eng_token"),
+                    }
+                );
+                setClient(stompClientInstance);
+            },
+            (error) => {
+                console.error("Error al conectar:", error);
+                // Manejar el error de conexión aquí
+            }
+        );
+    }, [userInfo]);
+
+    useEffect(() => {
+        if (
+            !currentQuestion?.answers?.find(
+                (answer) => answer.userId === userInfo?.id
+            )
+        )
             return;
         let audio = new Audio(mistake);
+        audio.volume = 0.6;
         if (
-            currentQuestion?.answers?.find((answer) => answer.userId === "1")
-                ?.isCorrect
+            currentQuestion?.answers?.find(
+                (answer) => answer.userId === userInfo?.id
+            )?.isCorrect
         ) {
             audio = new Audio(right);
+            audio.volume = 0.9;
         }
         audio.preload = "auto";
-        audio.volume = 0.9;
         audio.play();
     }, [showResult]);
 
@@ -250,7 +300,12 @@ export const Rooms = () => {
 
             if (currentQuestion === null) {
                 if (!areThere) {
+                    console.log("acá", areThere);
                     navigate("/completed/" + id);
+                    const audio = new Audio(suspense);
+                    audio.preload = "auto";
+                    audio.volume = 0.9;
+                    audio.play();
                     return;
                 }
 
@@ -263,10 +318,6 @@ export const Rooms = () => {
                         indexesOfNotAnsweredsQuestions[getRandomNumber]
                     ]
                 );
-
-                setCurrentQuestionIndex(
-                    indexesOfNotAnsweredsQuestions[getRandomNumber]
-                );
             }
         }
     }, [challenge]);
@@ -277,16 +328,18 @@ export const Rooms = () => {
             !(challenge instanceof Promise) &&
             currentQuestion !== null
         ) {
-            const foundedQuestionById = challenge.questions.find(
+            const currentQuestionCorrect = challenge.questions.find(
                 (question) => question.id === currentQuestion.id
             );
 
             if (
-                currentQuestion.answers?.length !==
-                foundedQuestionById?.answers?.length
+                currentQuestionCorrect.answers.some(
+                    (answer) => answer.userId === userInfo?.id
+                )
             ) {
-                setCurrentQuestion(foundedQuestionById);
+                setShowResult(true);
             }
+            setCurrentQuestion(currentQuestionCorrect);
         }
     }, [challenge]);
 
@@ -307,25 +360,41 @@ export const Rooms = () => {
 
             alert(data.status);
             setShowDelete(false);
-        } catch (error) {
-            console.log(error);
-        }
+        } catch (error) {}
     };
 
+    useEffect(() => {
+        const idTimeout = setTimeout(() => {
+            setHideQuestions(false);
+        }, 1500);
+
+        return () => {
+            clearTimeout(idTimeout);
+        };
+    }, []);
+
     return (
-        <div className="flex flex-col justify-between h-screen">
-            <div className="hidden for now">
+        <div className="relative flex flex-col justify-between h-screen">
+            <div
+                className={`${
+                    hideQuestions
+                        ? "absolute top-0 bottom-0 left-0 right-0 bg-white h-screen w-full z-20"
+                        : "hidden"
+                }`}
+            ></div>
+            <div className="hidden for now absolute right-0 top-[20%]">
                 <UserStatusDropdown />
             </div>
             <div className="hidden sm:flex">
                 <RoomHeader
                     points={
-                        challenge?.points?.find((point) => point.userId === "2")
-                            ?.points
+                        challenge?.players?.find(
+                            (player) => player.userId === userInfo?.id
+                        )?.points
                     }
                 />
             </div>
-            {showDelete && (
+            {/* {showDelete && (
                 <div
                     className="p-12 bg-red-100 mx-auto w-100"
                     style={{zIndex: 2000}}
@@ -344,7 +413,7 @@ export const Rooms = () => {
                 onClick={() => setShowDelete(!showDelete)}
             >
                 ABRIR ELIMINAR
-            </button>
+            </button> */}
             <div className="sm:mx-auto w-full sm:w-[540px]">
                 <div className="flex flex-col justify-between items-center px-4 sm:mx-0">
                     {["translation", "multiple choice"].includes(
@@ -376,7 +445,7 @@ export const Rooms = () => {
             </div>
             <RoomFooter
                 answer={currentQuestion?.answers?.find(
-                    (answer) => answer.userId === "1"
+                    (answer) => answer.userId === userInfo?.id
                 )}
                 showResult={showResult}
                 submit={handleSaveAnswer}

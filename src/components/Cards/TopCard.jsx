@@ -1,51 +1,23 @@
-import {useState, useEffect} from "react";
-
 export const TopCard = ({position, name, score}) => {
-    const [positionColor, setPositionColor] = useState("text-gray-800");
-    const [positionBgColor, setPositionBgColor] = useState("bg-gray-100");
-
-    useEffect(() => {
-        if (position === 1) {
-            setPositionColor("text-yellow-600");
-            setPositionBgColor(
-                "bg-gradient-to-r from-yellow-500 via-yellow-300 to-yellow-500"
-            );
-        } else if (position === 2) {
-            setPositionColor("text-gray-500");
-            setPositionBgColor(
-                "bg-gradient-to-r from-gray-400 via-gray-300 to-gray-400"
-            );
-        } else if (position === 3) {
-            setPositionColor("text-yellow-700");
-            setPositionBgColor(
-                "bg-gradient-to-r from-orange-400 via-orange-300 to-orange-400"
-            );
-        }
-    }, []);
     return (
-        <li className={`p-2 ${positionBgColor} rounded-xl`}>
+        <li className="px-0 py-2 rounded-xl bg-gradient-to-r from-gray-50 via-gray-50 to-gray-100 min-w-[290px] animate-fade-in">
             <div className="flex items-center justify-between text-xl">
                 <div className="flex items-center">
-                    <span
-                        className={`px-2 text-3xl font-bold ${positionColor}`}
-                    >
+                    <span className="px-5 text-base font-bold w-6 h-6 flex items-center justify-center">
                         {position}
                     </span>
-                    <div className="flex space-x-1 items-center justify-between">
-                        <img
-                            className="rounded-full "
-                            src="https://tailwindui.com/img/avatar-3.jpg"
-                            alt="profile"
-                            width="40"
-                        />
-                        <span className="font-light text-base truncate ...">
-                            {name}
-                        </span>
+                    <div className="flex space-x-2 items-center justify-between">
+                        <div className="capitalize bg-red-500 text-white rounded-xl group-hover:shadow-xl group-hover:shadow-gray-300 w-[42px] h-[42px] flex justify-center items-center font-bold text-2xl">
+                            {name.slice(0, 2)}
+                        </div>
+                        <div className="flex flex-col">
+                            <p className="font-semibold text-base truncate ...">
+                                {name}
+                            </p>
+                            <p className="text-gray-500 text-xs">{score}</p>
+                        </div>
                     </div>
                 </div>
-                <p className={`font-black ${position === 1 ? "" : ""}`}>
-                    {score}
-                </p>
             </div>
         </li>
     );

@@ -3,7 +3,7 @@ import {SignIn} from "./pages/SignIn/SignIn";
 import {Home} from "./pages/Home/Home";
 import {SignUp} from "./pages/SignUp/SignUp";
 import {Rooms} from "./pages/Rooms/Rooms";
-import {GroupChallenges} from "./pages/GroupChallenges/GroupChallenges.jsx";
+import {GroupLessons} from "./pages/GroupLessons/GroupLessons.jsx";
 import {EnglishLevel} from "./pages/EnglishLevel/EnglishLevel.jsx";
 import {MyContext} from "./context/AppContext.js";
 import {useInitialState} from "./hooks/useInitialState.js";
@@ -45,8 +45,8 @@ export default function App() {
                                 element={<Rooms />}
                             ></Route>
                             <Route
-                                path="/groupchallenges"
-                                element={<GroupChallenges />}
+                                path="/grouplessons"
+                                element={<GroupLessons />}
                             ></Route>
                             <Route
                                 path="/dashboard"

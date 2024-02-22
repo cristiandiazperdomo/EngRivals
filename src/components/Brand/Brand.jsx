@@ -1,17 +1,21 @@
 import {Link} from "react-router-dom";
 
+import logo from "../../assets/smaller-logo.png";
+import {useSelector} from "react-redux";
+
 export const Brand = () => {
+    const {userInfo} = useSelector((state) => state.userReducer);
+
     return (
-        <Link className="flex space-x-0 sm:space-x-2 items-center">
-            <img
-                src="https://i.imgur.com/MGd78zy.png"
-                width="52"
-                className="-mr-2"
-            ></img>
-            <div className="font-semibold text-xl">
+        <Link
+            to={userInfo === null ? "/" : "/dashboard"}
+            className="flex space-x-0 sm:space-x-2 items-center mt-2"
+        >
+            <img src={logo} width="38" className="object-cover"></img>
+            <h1 className="font-semibold text-xl">
                 <span className="text-yellow-400 font-bold"></span>Eng
                 <span className="text-black">Rivals</span>
-            </div>
+            </h1>
         </Link>
     );
 };

@@ -1,15 +1,22 @@
-import {useContext, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import {Button, TextField} from "@radix-ui/themes";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import {UserStats} from "../../components/Cards/UserStats";
 import {SideBarLeft} from "../../components/SideBarLeft/SideBarLeft";
 import {MyContext} from "../../context/AppContext";
 import {ImportantModal} from "../../components/Modals/ImportantModal";
+import {useDispatch, useSelector} from "react-redux";
+import {getUserInfo} from "../../redux/actions/userActions";
+import {useNavigate} from "react-router-dom";
 
 export const Profile = () => {
     const {isSideBarActive, toggleSideBar} = useContext(MyContext);
     const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
     const [editMode, setEditMode] = useState(false);
+
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const {userInfo} = useSelector((state) => state.userReducer);
 
     const handleEditProfile = () => {
         setEditMode(!editMode);
@@ -18,6 +25,14 @@ export const Profile = () => {
     const handleSaveNewInfo = () => {
         alert("Savedddd!!!");
     };
+
+    useEffect(() => {
+        if (userInfo === null) dispatch(getUserInfo(navigate));
+    }, []);
+
+    console.log(
+        (userInfo?.numberOfGamesWon * 100) / userInfo?.amountOfGamesPlayed
+    );
 
     return (
         <div>
@@ -49,17 +64,19 @@ export const Profile = () => {
                                 <path d="M4 12l16 0" />
                                 <path d="M4 18l16 0" />
                             </svg>
-                            <img
-                                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                                className="rounded-full ml-0.5 w-11 group-hover:shadow-xl group-hover:shadow-gray-300"
-                                alt="profile"
-                            />
-                            <span className="text-xl">Tim Cook</span>
+                            <div className="capitalize bg-red-400 text-white rounded-xl group-hover:shadow-xl group-hover:shadow-gray-300 w-[40px] h-[40px] flex justify-center items-center font-bold text-2xl">
+                                {userInfo?.name.slice(0, 2)}
+                            </div>
+                            <span className="text-xl uppercase font-bold">
+                                {userInfo?.name}
+                            </span>
                         </div>
                         <div className="flex items-center space-x-2">
                             <p className="flex flex-col sm:flex-row text-gray-500 text-xs sm:space-x-1">
                                 <span>Joined at:</span>
-                                <span>21/04/03</span>
+                                <span>
+                                    {userInfo?.creation_date.replace("T", " ")}
+                                </span>
                             </p>
                             <Button
                                 color="red"
@@ -106,7 +123,7 @@ export const Profile = () => {
             )}
             <SideBarLeft />
             <div
-                className={`transition-all duration-500 min-h-screen py-4 ${
+                className={`transition-all duration-500 absolute bottom-0 right-0 left-0 top-0 mt-20 h-100 py-4 ${
                     isSideBarActive ? "ml-0 sm:ml-64" : "container mx-auto"
                 }`}
             >
@@ -119,11 +136,9 @@ export const Profile = () => {
                                         Profile Image
                                     </p>
                                     <div className="relative flex justify-center items-center w-full bg-red-50 h-[400px] rounded-xl">
-                                        <img
-                                            src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=8&w=1024&h=1024&q=80"
-                                            className="rounded-xl group-hover:shadow-xl group-hover:shadow-gray-300 w-[300px]"
-                                            alt="profile"
-                                        />
+                                        <div className="capitalize bg-red-400 text-white rounded-xl group-hover:shadow-xl group-hover:shadow-gray-300 w-[100px] h-[100px] flex justify-center items-center font-bold text-4xl">
+                                            {userInfo?.name.slice(0, 2)}
+                                        </div>
                                         <div className="absolute top-4 right-8">
                                             <Tooltip.Provider>
                                                 <Tooltip.Root>
@@ -133,19 +148,19 @@ export const Profile = () => {
                                                                 onClick={
                                                                     handleEditProfile
                                                                 }
-                                                                className="inline-flex h-[35px] w-[35px] items-center justify-center rounded-full bg-red-200 outline-none shadow-none"
+                                                                className="inline-flex h-[35px] w-[35px] items-center justify-center rounded-full bg-blue-100 outline-none shadow-none"
                                                             >
                                                                 <svg
                                                                     xmlns="http://www.w3.org/2000/svg"
-                                                                    class="icon icon-tabler icon-tabler-pencil"
+                                                                    className="icon icon-tabler icon-tabler-pencil text-gray-600"
                                                                     width="24"
                                                                     height="24"
                                                                     viewBox="0 0 24 24"
-                                                                    stroke-width="2"
+                                                                    strokeWidth="2"
                                                                     stroke="currentColor"
                                                                     fill="none"
-                                                                    stroke-linecap="round"
-                                                                    stroke-linejoin="round"
+                                                                    strokeLinecap="round"
+                                                                    strokeLinejoin="round"
                                                                 >
                                                                     <path
                                                                         stroke="none"
@@ -172,37 +187,6 @@ export const Profile = () => {
                                             </Tooltip.Provider>
                                         </div>
                                     </div>
-                                    <Button
-                                        color="red"
-                                        variant="ghost"
-                                        className={`${
-                                            editMode ? "" : "hidden"
-                                        } w-[calc(100%-16px)] mx-auto font-semibold py-4`}
-                                    >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            className="icon icon-tabler icon-tabler-photo"
-                                            width="24"
-                                            height="24"
-                                            viewBox="0 0 24 24"
-                                            strokeWidth="2"
-                                            stroke="currentColor"
-                                            fill="none"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                        >
-                                            <path
-                                                stroke="none"
-                                                d="M0 0h24v24H0z"
-                                                fill="none"
-                                            />
-                                            <path d="M15 8h.01" />
-                                            <path d="M3 6a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v12a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3v-12z" />
-                                            <path d="M3 16l5 -5c.928 -.893 2.072 -.893 3 0l5 5" />
-                                            <path d="M14 14l1 -1c.928 -.893 2.072 -.893 3 0l3 3" />
-                                        </svg>
-                                        Change Profile Image
-                                    </Button>
                                 </div>
                                 <div className="mt-10 space-y-4">
                                     <p className="text-sm uppercase text-gray-500">
@@ -216,14 +200,18 @@ export const Profile = () => {
                                             First Name
                                         </label>
                                         <TextField.Input
-                                            className="py-6 px-3 focus:shadow-xl focus:shadow-green-100 border focus:border-green-500 cursor-not-allowed"
-                                            defaultValue="Tim Cook"
+                                            className={`py-6 px-3 focus:shadow-xl focus:shadow-green-100 border focus:border-green-500 ${
+                                                !editMode
+                                                    ? "cursor-not-allowed"
+                                                    : "cursor-pointer"
+                                            }`}
+                                            defaultValue={userInfo?.name}
                                             type="text"
                                             color="green"
                                             id="name"
                                             variant="soft"
                                             radius="large"
-                                            disabled
+                                            disabled={!editMode}
                                         />
                                     </div>
                                     <div className="space-y-1 w-100">
@@ -234,14 +222,18 @@ export const Profile = () => {
                                             Email
                                         </label>
                                         <TextField.Input
-                                            className="py-6 px-3 focus:shadow-xl focus:shadow-green-100 border focus:border-green-500 cursor-not-allowed"
-                                            defaultValue="timcook@gmail.com"
+                                            className={`py-6 px-3 focus:shadow-xl focus:shadow-green-100 border focus:border-green-500 ${
+                                                !editMode
+                                                    ? "cursor-not-allowed"
+                                                    : "cursor-pointer"
+                                            }`}
+                                            defaultValue={userInfo?.email}
                                             type="email"
                                             color="green"
                                             id="name"
                                             variant="soft"
                                             radius="large"
-                                            disabled
+                                            disabled={!editMode}
                                         />
                                     </div>
                                     <div className="space-y-1 w-100">
@@ -252,14 +244,18 @@ export const Profile = () => {
                                             Birthdate
                                         </label>
                                         <TextField.Input
-                                            className="py-6 px-3 focus:shadow-xl focus:shadow-green-100 border focus:border-green-500 cursor-not-allowed"
-                                            defaultValue="2004-05-02"
+                                            className={`py-6 px-3 focus:shadow-xl focus:shadow-green-100 border focus:border-green-500 ${
+                                                !editMode
+                                                    ? "cursor-not-allowed"
+                                                    : "cursor-pointer"
+                                            }`}
+                                            defaultValue={userInfo?.birthdate}
                                             type="date"
                                             color="green"
                                             id="name"
                                             variant="soft"
                                             radius="large"
-                                            disabled
+                                            disabled={!editMode}
                                         />
                                     </div>
                                     <div
@@ -296,31 +292,33 @@ export const Profile = () => {
                                         <p className="text-sm uppercase text-gray-500">
                                             English Level
                                         </p>
-                                        {[
-                                            "A1",
-                                            "A2",
-                                            "B1",
-                                            "B2",
-                                            "C1",
-                                            "C2",
-                                        ].map((level) => (
-                                            <div className="space-y-1 ">
-                                                <TextField.Input
-                                                    className={`py-6 px-3 w-full focus:shadow-xl ${
-                                                        level === "B1"
-                                                            ? "bg-green-200"
-                                                            : ""
-                                                    } focus:shadow-green-100 border focus:border-green-500 cursor-not-allowed`}
-                                                    defaultValue={level}
-                                                    type="text"
-                                                    color="green"
-                                                    id="name"
-                                                    variant="soft"
-                                                    radius="large"
-                                                    disabled
-                                                />
-                                            </div>
-                                        ))}
+                                        {["A1-A2", "B1-B2", "C1-C2"].map(
+                                            (level) => (
+                                                <div
+                                                    className="space-y-1"
+                                                    key={level}
+                                                >
+                                                    <TextField.Input
+                                                        className={`py-6 px-3 w-full focus:shadow-xl ${
+                                                            level.includes(
+                                                                userInfo
+                                                                    ?.englishLevel_id_level
+                                                                    ?.name
+                                                            )
+                                                                ? "bg-green-200"
+                                                                : ""
+                                                        } focus:shadow-green-100 border focus:border-green-500 cursor-not-allowed`}
+                                                        defaultValue={level}
+                                                        type="text"
+                                                        color="green"
+                                                        id="name"
+                                                        variant="soft"
+                                                        radius="large"
+                                                        disabled
+                                                    />
+                                                </div>
+                                            )
+                                        )}
                                     </div>
                                     <div className="space-y-4 w-full">
                                         <p className="text-sm uppercase text-gray-500">
@@ -328,24 +326,39 @@ export const Profile = () => {
                                         </p>
                                         <div className="space-y-2">
                                             <UserStats
+                                                category="Earned Lessons"
+                                                id="place-in-the-top"
+                                                value={
+                                                    userInfo?.numberOfGamesWon
+                                                }
+                                            />
+                                            <UserStats
                                                 category="Games Played"
                                                 id="games"
-                                                value={10}
+                                                value={
+                                                    userInfo?.amountOfGamesPlayed
+                                                }
+                                            />
+                                            <UserStats
+                                                category="Exp"
+                                                id="amount-of-xp"
+                                                value={userInfo?.amountOfExp}
                                             />
                                             <UserStats
                                                 category="Win rate"
                                                 id="win-rate"
-                                                value="59%"
+                                                value={
+                                                    Math.floor(
+                                                        (userInfo?.numberOfGamesWon *
+                                                            100) /
+                                                            userInfo?.amountOfGamesPlayed
+                                                    ) + "%"
+                                                }
                                             />
                                             <UserStats
                                                 category="Score"
-                                                id="amount-of-xp"
-                                                value="1248"
-                                            />
-                                            <UserStats
-                                                category="Place in the Top"
-                                                id="place-in-the-top"
-                                                value="150"
+                                                id="score"
+                                                value={userInfo?.score}
                                             />
                                         </div>
                                     </div>

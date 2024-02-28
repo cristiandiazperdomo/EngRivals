@@ -75,7 +75,7 @@ export const LoggedHeader = () => {
                                 <path d="M3 12l2 0" />
                                 <path d="M19 12l2 0" />
                             </svg>
-                            <span className="mt-1">
+                            <span className="mt-1.5">
                                 {
                                     routes[
                                         Object.keys(routes).find(

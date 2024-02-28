@@ -30,10 +30,6 @@ export const Profile = () => {
         if (userInfo === null) dispatch(getUserInfo(navigate));
     }, []);
 
-    console.log(
-        (userInfo?.numberOfGamesWon * 100) / userInfo?.amountOfGamesPlayed
-    );
-
     return (
         <div>
             <header className="h-[104px] flex items-center">
@@ -293,17 +289,17 @@ export const Profile = () => {
                                             English Level
                                         </p>
                                         {["A1-A2", "B1-B2", "C1-C2"].map(
-                                            (level) => (
+                                            (level, index) => (
                                                 <div
                                                     className="space-y-1"
                                                     key={level}
                                                 >
                                                     <TextField.Input
                                                         className={`py-6 px-3 w-full focus:shadow-xl ${
-                                                            level.includes(
-                                                                userInfo
-                                                                    ?.englishLevel_id_level
-                                                                    ?.name
+                                                            index + 1 ===
+                                                            Math.ceil(
+                                                                userInfo?.level_id_level /
+                                                                    2
                                                             )
                                                                 ? "bg-green-200"
                                                                 : ""
@@ -348,11 +344,16 @@ export const Profile = () => {
                                                 category="Win rate"
                                                 id="win-rate"
                                                 value={
-                                                    Math.floor(
-                                                        (userInfo?.numberOfGamesWon *
-                                                            100) /
-                                                            userInfo?.amountOfGamesPlayed
-                                                    ) + "%"
+                                                    userInfo?.numberOfGamesWon ===
+                                                        0 ||
+                                                    userInfo?.amountOfGamesPlayed ===
+                                                        0
+                                                        ? 0
+                                                        : Math.floor(
+                                                              (userInfo?.numberOfGamesWon *
+                                                                  100) /
+                                                                  userInfo?.amountOfGamesPlayed
+                                                          ) + "%"
                                                 }
                                             />
                                             <UserStats

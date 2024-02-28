@@ -19,7 +19,6 @@
 import {TextField} from "@radix-ui/themes";
 
 export const UserStats = ({id, category, value}) => {
-    console.log(value);
     return (
         <div className="w-full">
             <label htmlFor={id} className="font-bold text-gray-500 text-sm">

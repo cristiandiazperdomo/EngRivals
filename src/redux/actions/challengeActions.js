@@ -1,5 +1,18 @@
 import {refreshToken} from "../actions/userActions";
 
+export const cancelCreateLobby = (client) => {
+    return async (dispatch) => {
+        try {
+            const CREATE_CHALLENGE_URL = "/challenges/cancel-create-lobby";
+            client.send(CREATE_CHALLENGE_URL, {
+                Authorization: "Bearer " + localStorage.getItem("eng_token"),
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    };
+};
+
 export const createChallenge = (categoryId, client, userInfo, navigate) => {
     return async (dispatch) => {
         if (userInfo === null) return;
@@ -21,7 +34,10 @@ export const createChallenge = (categoryId, client, userInfo, navigate) => {
                 };
 
                 const CREATE_CHALLENGE_URL =
-                    "/challenges/create-room/" + categoryId + "/1";
+                    "/challenges/create-room/" +
+                    categoryId +
+                    "/" +
+                    userInfo.level_id_level;
                 client.send(
                     CREATE_CHALLENGE_URL,
                     {
@@ -94,12 +110,26 @@ export const getChallenge = (id) => {
     };
 };
 
-export const getAnswer = (challenge, setShowResult) => {
+export const savePlayersInfoSuccess = (players) => ({
+    type: "SAVE_PLAYER_INFO",
+    payload: players,
+});
+
+export const getAnswer = (responseBody, setCurrentQuestion, userInfo) => {
     return async (dispatch) => {
-        dispatch(getChallengeSuccess(challenge));
-        setShowResult(true);
+        dispatch(
+            getAnswerSuccess({
+                responseBody,
+                updateQuestion: {setCurrentQuestion, userInfo},
+            })
+        );
     };
 };
+
+const getAnswerSuccess = (data) => ({
+    type: "GET_ANSWER",
+    payload: data,
+});
 
 export const getChallengeSuccess = (data) => ({
     type: "GET_CHALLENGE",
@@ -119,6 +149,19 @@ export const saveUserAnswer = (questionWithAnswer, challengeId, client) => {
                 },
                 JSON.stringify(questionWithAnswer)
             );
+        } catch (error) {
+            console.log(error);
+        }
+    };
+};
+
+export const sendAEmoji = (client, challengeId, number) => {
+    return async (dispatch) => {
+        try {
+            const CREATE_CHALLENGE_URL = `/challenges/send-emoji/${challengeId}/${number}`;
+            client.send(CREATE_CHALLENGE_URL, {
+                Authorization: "Bearer " + localStorage.getItem("eng_token"),
+            });
         } catch (error) {
             console.log(error);
         }

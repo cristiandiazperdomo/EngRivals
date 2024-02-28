@@ -1,5 +1,4 @@
 import {Badge, Button} from "@radix-ui/themes";
-import * as Avatar from "@radix-ui/react-avatar";
 import {Link, useNavigate, useParams} from "react-router-dom";
 import {useContext, useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
@@ -22,7 +21,6 @@ export const TestCompleted = () => {
     const [wellAnsweredQuestions, setWellAnsweredQuestions] =
         useState(undefined);
     const [wellUsedWords, setWellUsedWords] = useState([]);
-    const [stompClient, setStompClient] = useState(null);
     const [client, setClient] = useState(null);
     const [noAnswers, setNoAnswers] = useState(false);
 
@@ -36,13 +34,14 @@ export const TestCompleted = () => {
 
     const foundWellUsedWords = () => {
         if (wellUsedWords.length === 6) return;
+
         const wellUsed = [];
 
         let hasNoAnswer = true;
         let minimumAmountOfWords = 0;
 
         challenge.questions.forEach((question) => {
-            question.answers.forEach((answer) => {
+            question?.answers?.forEach((answer) => {
                 if (answer.userId === userInfo?.id) {
                     hasNoAnswer = false;
                     if (answer.isCorrect) {
@@ -93,7 +92,7 @@ export const TestCompleted = () => {
 
             if (question === undefined) return;
 
-            const wellAnswered = question.answers.find(
+            const wellAnswered = question?.answers?.find(
                 (answer) => answer.userId === userInfo?.id
             );
 
@@ -158,6 +157,35 @@ export const TestCompleted = () => {
         navigate("/grouplessons");
     };
 
+    const handleGetSeconds = () => {
+        const currentTime = new Date();
+        let creationTime = new Date(challenge?.creationTime);
+
+        creationTime.setMinutes(creationTime.getMinutes() + 2);
+
+        const totalSeconds = Math.floor(
+            (creationTime.getTime() - currentTime.getTime()) / 1000
+        );
+
+        if (totalSeconds <= -5) {
+            const headers = {
+                Authorization: "Bearer " + localStorage.getItem("eng_token"),
+            };
+            const END_GAME = "/challenges/end-game/" + id;
+            client.send(END_GAME, headers);
+        }
+    };
+
+    useEffect(() => {
+        if (
+            challenge !== null &&
+            challenge.players.find((player) => player.userId === userInfo.id)
+                .finishTime === null
+        ) {
+            navigate("/rooms/" + id);
+        }
+    }, [challenge]);
+
     useEffect(() => {
         if (userInfo === null) dispatch(getUserInfo(navigate));
     }, []);
@@ -167,6 +195,27 @@ export const TestCompleted = () => {
             dispatch(getChallenge(id));
         }
     }, []);
+
+    useEffect(() => {
+        const idTimeout = setInterval(() => {
+            if (
+                challenge !== null &&
+                challenge.players.some((player) => player.finishTime === null)
+            ) {
+                handleGetSeconds();
+            }
+
+            if (
+                challenge !== null &&
+                challenge.players.every((player) => player.finishTime !== null)
+            )
+                clearInterval(idTimeout);
+        }, 1000);
+
+        return () => {
+            clearInterval(idTimeout);
+        };
+    }, [challenge]);
 
     useEffect(() => {
         if (client !== null) return;
@@ -194,6 +243,7 @@ export const TestCompleted = () => {
                     }
                 );
                 setClient(stompClientInstance);
+                stompClientInstance.disconnect();
             },
             (error) => {
                 console.error("Error al conectar:", error);
@@ -338,7 +388,7 @@ export const TestCompleted = () => {
                                     color="green"
                                     className="text-md"
                                 >
-                                    +6
+                                    + {wellUsedWords.length}
                                 </Badge>
                                 <span className="text-md text-black">
                                     Well used words

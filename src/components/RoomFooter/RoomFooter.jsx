@@ -4,7 +4,7 @@ import {Timer} from "../Timer/Timer";
 import {useEffect} from "react";
 
 export const RoomFooter = (props) => {
-    const {answer, showResult, submit, next, skip} = props;
+    const {currentQuestion, answer, showResult, submit, next, skip} = props;
 
     useEffect(() => {
         const handleKeyDown = (e) => {
@@ -52,14 +52,33 @@ export const RoomFooter = (props) => {
                                     />
                                     <path d="M5 12l5 5l10 -10" />
                                 </svg>
-                                <div className="">
-                                    <p className="font-black text-xl text-green-800">
-                                        Correct Answer:
-                                    </p>
-                                    <p className="text-green-800">
-                                        {answer?.correctAnswer}
-                                    </p>
-                                </div>
+                                {currentQuestion.options.some(
+                                    (option) => option.explanation !== null
+                                ) ? (
+                                    <div className="flex flex-col">
+                                        <p className="font-black text-xl text-green-800">
+                                            Explanation:
+                                        </p>
+                                        <p className="text-green-800">
+                                            {
+                                                currentQuestion?.options?.find(
+                                                    (option) =>
+                                                        option.explanation !==
+                                                        null
+                                                )?.explanation
+                                            }
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <div className="">
+                                        <p className="font-black text-xl text-green-800">
+                                            Correct Answer:
+                                        </p>
+                                        <p className="text-green-800">
+                                            {answer?.correctAnswer}
+                                        </p>
+                                    </div>
+                                )}
                             </div>
                         ) : (
                             <div className="flex sm:items-center space-x-4 w-full sm:w-100">
@@ -81,27 +100,44 @@ export const RoomFooter = (props) => {
                                     <path d="M18 6l-12 12" />
                                     <path d="M6 6l12 12" />
                                 </svg>
-                                <div className="">
-                                    <p className="font-black text-xl text-red-800">
-                                        Correct Answer:
-                                    </p>
-                                    <p className="text-red-800">
-                                        {answer?.correctAnswer}
-                                    </p>
-                                </div>
+                                {currentQuestion.options.some(
+                                    (option) => option.explanation !== null
+                                ) ? (
+                                    <div className="flex flex-col">
+                                        <p className="font-black text-xl text-red-800">
+                                            Explanation:
+                                        </p>
+                                        <p className="text-red-800">
+                                            {
+                                                currentQuestion?.options?.find(
+                                                    (option) =>
+                                                        option.explanation !==
+                                                        null
+                                                )?.explanation
+                                            }
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <div className="">
+                                        <p className="font-black text-xl text-red-800">
+                                            Correct Answer:
+                                        </p>
+                                        <p className="text-red-800">
+                                            {answer?.correctAnswer}
+                                        </p>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </>
                 ) : (
-                    <Button
+                    <button
                         size="4"
-                        variant="outline"
-                        color="green"
-                        className="hidden sm:flex text-black w-[140px] sm:w-[160px] hover:bg-green-100 bg-transparent"
+                        className="hidden sm:flex transition-all duration-200 text-black text-gray-400 w-[140px] sm:w-[160px] bg-transparent border-2 justify-center border-gray-300 hover:text-gray-700 hover:border-gray-700 p-2.5 rounded-xl"
                         onClick={skip}
                     >
                         Skip
-                    </Button>
+                    </button>
                 )}
                 <Timer />
                 <div className="flex sm:hidden w-full">

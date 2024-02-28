@@ -1,7 +1,7 @@
 import {TextField, Button} from "@radix-ui/themes";
 import {Link, useNavigate} from "react-router-dom";
 
-import pic from "../../assets/work-from-home.png";
+import pic from "../../assets/work-from-home.webp";
 import {useEffect, useRef, useState} from "react";
 import {useDispatch} from "react-redux";
 import {login} from "../../redux/actions/userActions";
@@ -9,6 +9,7 @@ import {login} from "../../redux/actions/userActions";
 export const SignIn = () => {
     const [error, setError] = useState(false);
     const [errorMessage, setErrorMessage] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
 
     const emailRef = useRef();
@@ -66,8 +67,8 @@ export const SignIn = () => {
                                     ref={emailRef}
                                     className={`transition-all duration-300 ${
                                         error ? "border-red-500" : ""
-                                    } py-6 px-3 focus:shadow-xl focus:shadow-green-100 border focus:border-green-500`}
-                                    color="green"
+                                    } py-6 px-3 focus:shadow-xl focus:shadow-yellow-100 border focus:border-yellow-500`}
+                                    color="yellow"
                                     id="email"
                                     variant="surface"
                                     radius="large"
@@ -77,17 +78,76 @@ export const SignIn = () => {
                                 <label htmlFor="password" className="font-bold">
                                     Password
                                 </label>
-                                <TextField.Input
-                                    ref={passwordRef}
-                                    className={`transition-all duration-300 ${
-                                        error ? "border-red-500" : ""
-                                    } py-6 px-3 focus:shadow-xl focus:shadow-green-100 border focus:border-green-500 w-full`}
-                                    type="password"
-                                    color="green"
-                                    id="password"
-                                    variant="surface"
-                                    radius="large"
-                                />
+                                <div className="relative">
+                                    <div>
+                                        <TextField.Input
+                                            ref={passwordRef}
+                                            className={`transition-all duration-300 ${
+                                                error ? "border-red-500" : ""
+                                            } py-6 px-3 focus:shadow-xl focus:shadow-yellow-100 border focus:border-yellow-500 w-full`}
+                                            type={
+                                                showPassword
+                                                    ? "text"
+                                                    : "password"
+                                            }
+                                            color="yellow"
+                                            id="password"
+                                            variant="surface"
+                                            radius="large"
+                                        />
+                                    </div>
+                                    <span
+                                        className="transition-all duration-200 absolute top-0 right-1 mt-1 p-2 cursor-pointer text-gray-400 hover:text-gray-800"
+                                        onClick={() =>
+                                            setShowPassword(!showPassword)
+                                        }
+                                    >
+                                        {showPassword ? (
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                className="icon icon-tabler icon-tabler-eye-off"
+                                                width="24"
+                                                height="24"
+                                                viewBox="0 0 24 24"
+                                                strokeWidth="1.5"
+                                                stroke="currentColor"
+                                                fill="none"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                            >
+                                                <path
+                                                    stroke="none"
+                                                    d="M0 0h24v24H0z"
+                                                    fill="none"
+                                                />
+                                                <path d="M10.585 10.587a2 2 0 0 0 2.829 2.828" />
+                                                <path d="M16.681 16.673a8.717 8.717 0 0 1 -4.681 1.327c-3.6 0 -6.6 -2 -9 -6c1.272 -2.12 2.712 -3.678 4.32 -4.674m2.86 -1.146a9.055 9.055 0 0 1 1.82 -.18c3.6 0 6.6 2 9 6c-.666 1.11 -1.379 2.067 -2.138 2.87" />
+                                                <path d="M3 3l18 18" />
+                                            </svg>
+                                        ) : (
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                className="icon icon-tabler icon-tabler-eye"
+                                                width="24"
+                                                height="24"
+                                                viewBox="0 0 24 24"
+                                                strokeWidth="1.5"
+                                                stroke="currentColor"
+                                                fill="none"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                            >
+                                                <path
+                                                    stroke="none"
+                                                    d="M0 0h24v24H0z"
+                                                    fill="none"
+                                                />
+                                                <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+                                                <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" />
+                                            </svg>
+                                        )}
+                                    </span>
+                                </div>
                             </div>
                             <div
                                 className={`transition-all duration-300 ${

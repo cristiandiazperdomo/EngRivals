@@ -43,9 +43,9 @@ export const HeroSection = () => {
                         <div className="mt-4 sm:mt-10 mb-10">
                             <h2 className="text-left text-4xl sm:text-5xl xl:text-6xl font-bold">
                                 <span className="text-red-500 block">
-                                    Compete with others
+                                    Learn English by
                                 </span>{" "}
-                                English enthusiasts.
+                                competing against others
                             </h2>
                             <div className="text-gray-600 space-y-1.5 my-4">
                                 <p>

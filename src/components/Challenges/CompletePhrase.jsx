@@ -28,8 +28,6 @@ export const CompletePhrase = ({title, phrase, userPhraseRef}) => {
             (word, index) => index !== position
         );
 
-        userPhrase.forEach((word, index) => console.log(word, index + 1));
-
         setUserPhrase(
             updatedUserPhrase.map((word, index) => ({...word, id: index + 1}))
         );
@@ -60,17 +58,6 @@ export const CompletePhrase = ({title, phrase, userPhraseRef}) => {
                     className="flex flex-wrap gap-2 min-h-[124px] border-b-2 pb-2"
                     ref={userPhraseRef}
                 >
-                    {/*userPhrase?.map((word, index) => (
-                        <span
-                            key={index}
-                            className="bg-transparent p-2 sm:p-3 border rounded-full w-100 max-h-12 border-2 cursor-pointer"
-                            onClick={() =>
-                                handleRemoveFromUserPhrase(index)
-                            }
-                        >
-                            {word.word}
-                        </span>
-                        ))*/}
                     <DndContext
                         collisionDetection={closestCenter}
                         onDragEnd={handleDragEnd}

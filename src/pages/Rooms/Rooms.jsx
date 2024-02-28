@@ -5,9 +5,12 @@ import {RoomHeader} from "../../components/RoomHeader/RoomHeader";
 import {RoomFooter} from "../../components/RoomFooter/RoomFooter";
 import {useContext, useEffect, useRef, useState} from "react";
 import {
+    getAnswer,
     getChallenge,
     getChallengeSuccess,
+    savePlayersInfoSuccess,
     saveUserAnswer,
+    sendAEmoji,
 } from "../../redux/actions/challengeActions";
 import {useDispatch, useSelector} from "react-redux";
 import {useNavigate, useParams} from "react-router-dom";
@@ -28,6 +31,7 @@ export const Rooms = () => {
     const [showDelete, setShowDelete] = useState(false);
     const [hideQuestions, setHideQuestions] = useState(true);
     const [client, setClient] = useState(null);
+    // const [iconNumber, setIconNumber] = useState(0);
 
     const optionsList = useRef();
     const userPhraseRef = useRef();
@@ -77,7 +81,6 @@ export const Rooms = () => {
             audio.preload = "auto";
             audio.volume = 0.9;
             audio.play();
-            console.log("acá", areThere);
             navigate("/completed/" + id);
         }
 
@@ -172,6 +175,8 @@ export const Rooms = () => {
 
         const questionWithAnswer = structuredClone(currentQuestion);
 
+        if (completeAnswer.slice(1, completeAnswer.length) === "") return null;
+
         questionWithAnswer.answers = [
             {
                 answer: completeAnswer.slice(1, completeAnswer.length),
@@ -217,9 +222,14 @@ export const Rooms = () => {
             questionWithAnswer = handleWritingQuestion();
         }
 
-        if (questionWithAnswer === null) return;
+        if (questionWithAnswer === null || questionWithAnswer === undefined)
+            return;
 
         dispatch(saveUserAnswer(questionWithAnswer, id, client));
+    };
+
+    const handleSendEmoji = (number) => {
+        //dispatch(sendAEmoji(client, id, number));
     };
 
     useEffect(() => {
@@ -241,20 +251,29 @@ export const Rooms = () => {
         if (userInfo === null) return;
         const socket = new SockJS("http://localhost:8080/ws");
         const stompClientInstance = Stomp.over(socket);
+        stompClientInstance.debug = () => {};
         stompClientInstance.connect(
             {
                 Authorization: "Bearer " + localStorage.getItem("eng_token"),
             },
             (frame) => {
                 stompClientInstance.subscribe(
-                    "/rooms/game/" + userInfo?.id,
+                    "/rooms/game/" + userInfo?.id + "/" + id,
                     (message) => {
-                        const challenge = JSON.parse(message.body);
-                        if (challenge.status) {
-                            alert(challenge.status);
+                        const responseBody = JSON.parse(message.body);
+                        if (responseBody.status) {
+                            alert(responseBody.status);
+                        } else if (responseBody.answers === null) {
+                            dispatch(
+                                savePlayersInfoSuccess(responseBody.players)
+                            );
                         } else {
                             dispatch(
-                                getChallengeSuccess(challenge, setShowResult)
+                                getAnswer(
+                                    responseBody,
+                                    setCurrentQuestion,
+                                    userInfo
+                                )
                             );
                         }
                     },
@@ -273,25 +292,38 @@ export const Rooms = () => {
     }, [userInfo]);
 
     useEffect(() => {
-        if (
-            !currentQuestion?.answers?.find(
-                (answer) => answer.userId === userInfo?.id
-            )
-        )
-            return;
-        let audio = new Audio(mistake);
-        audio.volume = 0.6;
-        if (
-            currentQuestion?.answers?.find(
-                (answer) => answer.userId === userInfo?.id
-            )?.isCorrect
-        ) {
-            audio = new Audio(right);
-            audio.volume = 0.9;
-        }
-        audio.preload = "auto";
-        audio.play();
-    }, [showResult]);
+        /*if (client !== null) return;
+        if (userInfo === null) return;
+        const socket = new SockJS("http://localhost:8080/ws");
+        const stompClientInstance = Stomp.over(socket);
+        stompClientInstance.connect(
+            {
+                Authorization: "Bearer " + localStorage.getItem("eng_token"),
+            },
+            (frame) => {
+                stompClientInstance.subscribe(
+                    "/rooms/emojis/" + userInfo?.id,
+                    (message) => {
+                        const responseBody = JSON.parse(message.body);
+                        if (responseBody.status) {
+                            alert(responseBody.status);
+                        } else {
+                            setIconNumber(responseBody);
+                        }
+                    },
+                    {
+                        Authorization:
+                            "Bearer " + localStorage.getItem("eng_token"),
+                    }
+                );
+                setClient(stompClientInstance);
+            },
+            (error) => {
+                console.error("Error al conectar:", error);
+                // Manejar el error de conexión aquí
+            }
+        );*/
+    }, [userInfo]);
 
     useEffect(() => {
         if (challenge !== null && !(challenge instanceof Promise)) {
@@ -300,7 +332,6 @@ export const Rooms = () => {
 
             if (currentQuestion === null) {
                 if (!areThere) {
-                    console.log("acá", areThere);
                     navigate("/completed/" + id);
                     const audio = new Audio(suspense);
                     audio.preload = "auto";
@@ -328,20 +359,15 @@ export const Rooms = () => {
             !(challenge instanceof Promise) &&
             currentQuestion !== null
         ) {
-            const currentQuestionCorrect = challenge.questions.find(
-                (question) => question.id === currentQuestion.id
-            );
-
             if (
-                currentQuestionCorrect.answers.some(
+                currentQuestion?.answers?.some(
                     (answer) => answer.userId === userInfo?.id
                 )
             ) {
                 setShowResult(true);
             }
-            setCurrentQuestion(currentQuestionCorrect);
         }
-    }, [challenge]);
+    }, [currentQuestion]);
 
     const handleEditDeleteQuestion = async () => {
         try {
@@ -373,6 +399,27 @@ export const Rooms = () => {
         };
     }, []);
 
+    useEffect(() => {
+        if (
+            !currentQuestion?.answers?.find(
+                (answer) => answer.userId === userInfo?.id
+            )
+        )
+            return;
+        let audio = new Audio(mistake);
+        audio.volume = 0.6;
+        if (
+            currentQuestion?.answers?.find(
+                (answer) => answer.userId === userInfo?.id
+            )?.isCorrect
+        ) {
+            audio = new Audio(right);
+            audio.volume = 0.9;
+        }
+        audio.preload = "auto";
+        audio.play();
+    }, [showResult]);
+
     return (
         <div className="relative flex flex-col justify-between h-screen">
             <div
@@ -382,7 +429,7 @@ export const Rooms = () => {
                         : "hidden"
                 }`}
             ></div>
-            <div className="hidden for now absolute right-0 top-[20%]">
+            <div className="hidden for now absolute right-0 top-40">
                 <UserStatusDropdown />
             </div>
             <div className="hidden sm:flex">
@@ -394,26 +441,8 @@ export const Rooms = () => {
                     }
                 />
             </div>
-            {/* {showDelete && (
-                <div
-                    className="p-12 bg-red-100 mx-auto w-100"
-                    style={{zIndex: 2000}}
-                >
-                    <button
-                        className="bg-black text-white p-2 rounded-xl"
-                        onClick={handleEditDeleteQuestion}
-                    >
-                        ELIMINAR PREGUNTA
-                    </button>
-                </div>
-            )}
-            <button
-                className="bg-red-600 text-white p-2 rounded-xl w-100 mx-auto cursor-pointer absolute right-20 top-20"
-                style={{zIndex: 1000}}
-                onClick={() => setShowDelete(!showDelete)}
-            >
-                ABRIR ELIMINAR
-            </button> */}
+            {/* <Emojis handleSendEmoji={handleSendEmoji} />
+            <ShowEmojis iconNumber={iconNumber} setIconNumber={setIconNumber} /> */}
             <div className="sm:mx-auto w-full sm:w-[540px]">
                 <div className="flex flex-col justify-between items-center px-4 sm:mx-0">
                     {["translation", "multiple choice"].includes(
@@ -444,6 +473,7 @@ export const Rooms = () => {
                 </div>
             </div>
             <RoomFooter
+                currentQuestion={currentQuestion}
                 answer={currentQuestion?.answers?.find(
                     (answer) => answer.userId === userInfo?.id
                 )}

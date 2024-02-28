@@ -19,8 +19,6 @@ export const Header = () => {
         if (userInfo === null) dispatch(getUserInfo());
     }, [userInfo]);
 
-    console.log(userInfo);
-
     return (
         <>
             {showMobileNavHeader && (

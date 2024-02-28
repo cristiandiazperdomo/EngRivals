@@ -23,7 +23,6 @@ export const Translate = ({currentQuestion, optionsList, title, options}) => {
 
             const data = await response.json();
 
-            console.log(data);
             alert(data.typeOfExercise);
         } catch (error) {
             console.log(error);

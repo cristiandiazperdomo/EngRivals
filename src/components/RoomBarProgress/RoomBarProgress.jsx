@@ -1,11 +1,9 @@
-import {useContext, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import {useSelector} from "react-redux";
-import {MyContext} from "../../context/AppContext";
 
 export const RoomBarProgress = () => {
     const [numberOfAnsweredQuestions, setNumberOfAnsweredQuestions] =
         useState(0);
-    const {randomNumber} = useContext(MyContext);
 
     const {challenge} = useSelector((state) => state.challengeReducer);
     const {userInfo} = useSelector((state) => state.userReducer);

@@ -8,6 +8,7 @@ import {LoaderScreen} from "../../components/LoaderScreen/LoaderScreen";
 import {useNavigate} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {
+    cancelCreateLobby,
     createChallenge,
     getChallengeSuccess,
     joinToChallenge,
@@ -49,6 +50,10 @@ export const GroupLessons = () => {
     const [titleLoader, setTitleLoader] = useState("");
     const {isSideBarActive} = useContext(MyContext);
     const [client, setClient] = useState(null);
+    const [isLookingForAGame, setIsLookingForAGame] = useState(false);
+    const [categorySelected, setCategorySelected] = useState("");
+    const [hasTheLessonBeenCanceled, setHasTheLessonBeenCanceled] =
+        useState(false);
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -56,16 +61,35 @@ export const GroupLessons = () => {
     const {challenge} = useSelector((state) => state.challengeReducer);
     const {userInfo} = useSelector((state) => state.userReducer);
 
+    const handleCancelCreateLobby = () => {
+        if (client === null) return;
+        if (!isLookingForAGame) return;
+        if (userInfo === null) return;
+
+        dispatch(cancelCreateLobby(client));
+        setHasTheLessonBeenCanceled(true);
+    };
+
     const handleCreateLobby = (categoryId) => {
+        if (client === null) return;
+        if (isLookingForAGame) return;
         setTitleLoader(challengeCards[categoryId - 1].category);
-        setShowLoaderScreen(true);
+        setCategorySelected(challengeCards[categoryId - 1].category);
         dispatch(createChallenge(categoryId, client, userInfo, navigate));
     };
 
-    const handleJoinALobby = (lobby) => {
+    const handleJoinALesson = (lobby) => {
         const {challengeId, isFull} = lobby;
         if (isFull) return;
         dispatch(joinToChallenge(challengeId, client, userInfo, navigate));
+    };
+
+    const handleCreateRandomLesson = () => {
+        if (isLookingForAGame) return;
+        const max = 4;
+        const min = 1;
+        const randomNumber = Math.floor(Math.random() * (max - min + 1) + min);
+        handleCreateLobby(randomNumber);
     };
 
     useEffect(() => {
@@ -74,6 +98,7 @@ export const GroupLessons = () => {
 
         const socket = new SockJS("http://localhost:8080/ws");
         const stompClientInstance = Stomp.over(socket);
+
         stompClientInstance.connect(
             {
                 Authorization: "Bearer " + localStorage.getItem("eng_token"),
@@ -100,6 +125,12 @@ export const GroupLessons = () => {
                 console.error("Error al conectar:", error);
             }
         );
+
+        return () => {
+            if (stompClientInstance && stompClientInstance.connected) {
+                stompClientInstance.disconnect();
+            }
+        };
     }, [userInfo]);
 
     useEffect(() => {
@@ -133,7 +164,7 @@ export const GroupLessons = () => {
                                 <UserPositionInTop score={userInfo?.score} />
                             </div>
                             <p className="text-gray-600">
-                                Welcome to group challenges, where you practice
+                                Welcome to group lessons, where you practice
                                 challenging other users.
                             </p>
                         </div>
@@ -144,14 +175,28 @@ export const GroupLessons = () => {
                                 key={challenge.category}
                                 category={challenge.category}
                                 image={challenge.image}
+                                hasTheLessonBeenCanceled={
+                                    hasTheLessonBeenCanceled
+                                }
+                                setHasTheLessonBeenCanceled={
+                                    setHasTheLessonBeenCanceled
+                                }
                                 handleCreateLobby={() =>
                                     handleCreateLobby(challenge.categoryId)
+                                }
+                                isLookingForAGame={isLookingForAGame}
+                                categorySelected={categorySelected}
+                                handleCancelCreateLobby={
+                                    handleCancelCreateLobby
                                 }
                             />
                         ))}
                     </div>
                     <Lobbies
-                        handleCreateLobby={handleJoinALobby}
+                        setIsLookingForAGame={setIsLookingForAGame}
+                        setCategorySelected={setCategorySelected}
+                        handleJoinALesson={handleJoinALesson}
+                        handleCreateRandomLesson={handleCreateRandomLesson}
                         userInfo={userInfo}
                     />
                 </div>

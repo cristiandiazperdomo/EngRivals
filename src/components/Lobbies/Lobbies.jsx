@@ -5,9 +5,27 @@ import notFound from "../../assets/floating.svg";
 import SockJS from "sockjs-client";
 import Stomp from "stompjs";
 
-export const Lobbies = ({handleCreateLobby, userInfo}) => {
+export const Lobbies = ({
+    handleJoinALesson,
+    handleCreateRandomLesson,
+    userInfo,
+    setIsLookingForAGame,
+    setCategorySelected,
+}) => {
     const [client, setClient] = useState(null);
     const [lobbies, setLobbies] = useState([]);
+
+    const hasAlreadyCreatedAGame = () => {
+        const lobby = lobbies.find((lobby) => lobby.creatorId === userInfo?.id);
+
+        if (lobby !== null && lobby !== undefined) {
+            setIsLookingForAGame(true);
+            setCategorySelected(lobby?.title);
+        } else {
+            setIsLookingForAGame(false);
+            setCategorySelected("");
+        }
+    };
 
     useEffect(() => {
         if (client !== null) return;
@@ -36,6 +54,10 @@ export const Lobbies = ({handleCreateLobby, userInfo}) => {
             }
         );
     }, []);
+
+    useEffect(() => {
+        if (userInfo !== null) hasAlreadyCreatedAGame();
+    }, [lobbies, userInfo]);
 
     useEffect(() => {
         const getChallenges = async () => {
@@ -201,7 +223,7 @@ export const Lobbies = ({handleCreateLobby, userInfo}) => {
                                                                 color="green"
                                                                 variant="outline"
                                                                 onClick={() =>
-                                                                    handleCreateLobby(
+                                                                    handleJoinALesson(
                                                                         lobby
                                                                     )
                                                                 }
@@ -220,7 +242,7 @@ export const Lobbies = ({handleCreateLobby, userInfo}) => {
                             <div className="h-[calc(40px+62px+62px+62px+62px+62px)] bg-gray-100 relative flex justify-center items-center overflow-x-auto shadow-md sm:rounded-lg w-full ">
                                 <div className="flex flex-col text-center items-center space-y-2">
                                     <p className="font-bold text-lg">
-                                        No se han encontrado partidas
+                                        No lessons found
                                     </p>
                                     <img
                                         src={notFound}
@@ -229,14 +251,15 @@ export const Lobbies = ({handleCreateLobby, userInfo}) => {
                                     />
                                     <div className="flex space-x-2 items-center">
                                         <p className="text-lg font-bold">
-                                            Crea una partida al azar
+                                            Create a random lesson
                                         </p>
                                         <Button
+                                            onClick={handleCreateRandomLesson}
                                             variant="solid"
                                             color="red"
                                             size="3"
                                         >
-                                            Crear
+                                            Create
                                         </Button>
                                     </div>
                                 </div>

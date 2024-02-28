@@ -39,29 +39,29 @@ export const LoggedHeaderDropdown = ({userInfo}) => {
                 id="dropdownInformation"
                 className={`absolute top-12 transition-all duration-50 ${
                     showDropdown ? "opacity-100 z-50" : "opacity-0 -z-20"
-                } right-0 text-left bg-white divide-y divide-gray-100 rounded-lg shadow w-52 dark:bg-gray-700 dark:divide-gray-600`}
+                } right-0 text-left bg-white divide-y divide-gray-100 rounded-lg shadow w-52`}
             >
-                <div className="px-4 py-3 text-sm text-gray-900 dark:text-white truncate">
+                <div className="px-4 py-3 text-sm text-gray-900 truncate">
                     <div>{userInfo?.name}</div>
                     <div className="font-medium truncate">
                         {userInfo?.email}
                     </div>
                 </div>
                 <ul
-                    className="py-2 text-sm text-gray-700 dark:text-gray-200"
+                    className="py-2 text-sm text-gray-700"
                     aria-labelledby="dropdownInformationButton"
                 >
                     <li>
                         <Link
                             to="/profile"
-                            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                            className="block px-4 py-2 hover:bg-gray-100"
                         >
                             Profile
                         </Link>
                     </li>
                 </ul>
                 <div className="py-2" onClick={handleLogout}>
-                    <p className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">
+                    <p className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                         Sign out
                     </p>
                 </div>

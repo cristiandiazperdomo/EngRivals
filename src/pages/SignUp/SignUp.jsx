@@ -5,7 +5,7 @@ import {Link} from "react-router-dom";
 import {useDispatch} from "react-redux";
 import {createAccount} from "../../redux/actions/userActions";
 
-import pic from "../../assets/work-from-anywhere.png";
+import pic from "../../assets/work-from-anywhere.webp";
 
 export const SignUp = () => {
     const [nameError, setNameError] = useState(false);

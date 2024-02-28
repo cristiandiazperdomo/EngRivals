@@ -43,7 +43,6 @@ export const Timer = () => {
         );
 
         if (player?.finishTime !== null && player?.finishTime !== undefined) {
-            console.log("acá se gue");
             navigate("/completed/" + id);
         }
 
@@ -64,7 +63,7 @@ export const Timer = () => {
         if (client !== null) return;
         const socket = new SockJS("http://localhost:8080/ws");
         const stompClientInstance = Stomp.over(socket);
-
+        stompClientInstance.debug = () => {};
         stompClientInstance.connect(
             {
                 Authorization: "Bearer " + localStorage.getItem("eng_token"),
